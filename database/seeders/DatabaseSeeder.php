@@ -17,9 +17,22 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'admin@siafnin.com'],
+            [
+                'name' => 'Administrador',
+                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+            ]
+        );
+
+        $this->call(CatalogSeeder::class);
     }
 }

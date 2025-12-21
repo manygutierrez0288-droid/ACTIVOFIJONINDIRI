@@ -13,11 +13,33 @@ class ActivoFijoRepository extends BaseRepository
 
     public function getAllWithRelations()
     {
-        return $this->model->with(['categoria', 'departamento', 'ubicacion'])->get();
+        return $this->model->with([
+            'categoria',
+            'departamento',
+            'ubicacion',
+            'marca',
+            'modelo',
+            'color',
+            'fuente',
+            'proveedor',
+            'responsable',
+            'estado'
+        ])->get();
     }
 
     public function getByIdWithRelations($id)
     {
-        return $this->model->with(['categoria', 'departamento', 'ubicacion'])->find($id);
+        return $this->model->with([
+            'categoria',
+            'departamento',
+            'ubicacion',
+            'marca',
+            'modelo',
+            'color',
+            'fuente',
+            'proveedor',
+            'responsable',
+            'estado'
+        ])->find($id);
     }
 }

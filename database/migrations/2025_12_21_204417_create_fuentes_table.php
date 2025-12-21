@@ -10,6 +10,8 @@ return new class extends Migration {
         Schema::create('fuentes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100)->unique();
+            $table->string('descripcion')->nullable();
+            $table->boolean('activo')->default(true);
             $table->timestamps();
         });
     }
