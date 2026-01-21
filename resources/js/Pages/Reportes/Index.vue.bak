@@ -1,0 +1,376 @@
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/vue3';
+import { ref, onMounted, watch, computed } from 'vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import { FileSpreadsheet, FileText, Printer } from 'lucide-vue-next';
+
+const props = defineProps({
+    categorias: Array,
+    departamentos: Array,
+    ubicaciones: Array,
+});
+
+const reportType = ref('inventario');
+const reportData = ref([]);
+const loading = ref(false);
+
+const filters = ref({
+    fecha_inicio: '',
+    fecha_fin: '',
+    categoria_id: '',
+    departamento_id: '',
+    ubicacion_id: '',
+});
+
+const columns = ref([]);
+
+const fetchReport = async () => {
+    loading.value = true;
+    reportData.value = [];
+    columns.value = [];
+    try {
+        const params = new URLSearchParams({
+            type: reportType.value,
+            ...filters.value
+        });
+        const response = await fetch(route('reportes.data') + '?' + params.toString());
+        const data = await response.json();
+        reportData.value = data;
+        
+        if (data.length > 0) {
+            columns.value = Object.keys(data[0]);
+        } else {
+            columns.value = [];
+        }
+    } catch (error) {
+        console.error("Error fetching report:", error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const exportExcel = () => {
+    const params = new URLSearchParams({
+        report_type: reportType.value,
+        format: 'excel',
+        ...filters.value
+    });
+    window.location.href = route('reportes.export') + '?' + params.toString();
+};
+
+const exportPdf = () => {
+    const params = new URLSearchParams({
+        report_type: reportType.value,
+        format: 'pdf',
+        ...filters.value
+    });
+    window.open(route('reportes.export') + '?' + params.toString(), '_blank');
+};
+
+const documentNumber = ref('---');
+
+const printReport = async () => {
+    try {
+        const response = await axios.post(route('reportes.generar-consecutivo'), { 
+            type: reportType.value 
+        });
+        
+        if (response.data && response.data.codigo) {
+            documentNumber.value = response.data.codigo;
+        } else {
+             console.error('Failed to generate consecutive');
+             documentNumber.value = 'ERROR-GEN';
+        }
+
+        // Wait for DOM update and then trigger print
+        setTimeout(() => {
+            window.print();
+        }, 500);
+
+    } catch (error) {
+        console.error("Error generating report number:", error);
+        documentNumber.value = 'ERROR-NET';
+        // Still print even if error
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    }
+};
+
+// Calculate totals for numeric columns
+const columnTotals = computed(() => {
+    if (reportData.value.length === 0 || columns.value.length === 0) {
+        return {};
+    }
+    
+    const totals = {};
+    columns.value.forEach((col, index) => {
+        let sum = 0;
+        let isNumeric = true;
+        
+        reportData.value.forEach(row => {
+            const value = row[col];
+            // Remove currency symbols, commas, and spaces for calculation
+            const cleanValue = String(value).replace(/[^0-9.-]/g, '');
+            
+            if (cleanValue && !isNaN(parseFloat(cleanValue))) {
+                sum += parseFloat(cleanValue);
+            } else if (value && String(value).trim() !== '') {
+                isNumeric = false;
+            }
+        });
+        
+        totals[col] = isNumeric && sum !== 0 ? sum.toLocaleString('es-NI', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+    });
+    
+    return totals;
+});
+
+// Refetch when type changes
+watch(reportType, () => fetchReport());
+
+onMounted(() => {
+    fetchReport();
+});
+</script>
+
+<template>
+    <Head title="Reportes" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Módulo de Reportes</h2>
+        </template>
+
+        
+            
+                
+                <!-- Filters Section (Hidden on Print) -->
+                <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg print:hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <!-- Report Type Selector -->
+                        <div class="col-span-1 md:col-span-4 border-b pb-4 mb-4">
+                            <InputLabel value="Tipo de Reporte" class="mb-2 text-lg" />
+                            <div class="flex flex-col sm:flex-row gap-2 sm:space-x-4">
+                                <button 
+                                    @click="reportType = 'inventario'"
+                                    :class="['w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors text-center', reportType === 'inventario' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300']"
+                                >
+                                    Inventario General
+                                </button>
+                                <button 
+                                    @click="reportType = 'depreciacion'"
+                                    :class="['w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors text-center', reportType === 'depreciacion' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300']"
+                                >
+                                    Depreciación
+                                </button>
+                                <button 
+                                    @click="reportType = 'categoria'"
+                                    :class="['w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors text-center', reportType === 'categoria' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300']"
+                                >
+                                    Por Categoría
+                                </button>
+                                <button 
+                                    @click="reportType = 'acciones'"
+                                    :class="['w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors text-center', reportType === 'acciones' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300']"
+                                >
+                                    Por Acciones
+                                </button>
+                                <button 
+                                    @click="reportType = 'libro_activos'"
+                                    :class="['w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors text-center', reportType === 'libro_activos' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300']"
+                                >
+                                    Libro de Activo Fijo
+                                </button>
+                                <button 
+                                    @click="reportType = 'resumen_mensual'"
+                                    :class="['w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors text-center', reportType === 'resumen_mensual' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300']"
+                                >
+                                    Resumen Mensual
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Filters -->
+                        <div>
+                            <InputLabel for="categoria" value="Categoría" />
+                            <select id="categoria" v-model="filters.categoria_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">Todas</option>
+                                <option v-for="cat in categorias" :key="cat.id" :value="cat.id">{{ cat.nombre }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <InputLabel for="departamento" value="Departamento" />
+                            <select id="departamento" v-model="filters.departamento_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">Todos</option>
+                                <option v-for="dep in departamentos" :key="dep.id" :value="dep.id">{{ dep.nombre }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <InputLabel for="f_inicio" value="Desde" />
+                            <TextInput id="f_inicio" type="date" v-model="filters.fecha_inicio" class="w-full" />
+                        </div>
+                        <div>
+                            <InputLabel for="f_fin" value="Hasta" />
+                            <TextInput id="f_fin" type="date" v-model="filters.fecha_fin" class="w-full" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:justify-end gap-3">
+                        <SecondaryButton @click="fetchReport" :disabled="loading" class="w-full sm:w-auto justify-center">
+                            <span v-if="loading">Cargando...</span>
+                            <span v-else>Filtrar</span>
+                        </SecondaryButton>
+                        <SecondaryButton @click="exportExcel" class="w-full sm:w-auto justify-center">
+                            <FileSpreadsheet class="w-4 h-4 mr-2" />
+                            Excel
+                        </SecondaryButton>
+                         <SecondaryButton @click="exportPdf" class="w-full sm:w-auto justify-center">
+                            <FileText class="w-4 h-4 mr-2" />
+                            PDF
+                        </SecondaryButton>
+                        <PrimaryButton @click="printReport" title="Imprimir reporte actual" class="w-full sm:w-auto justify-center">
+                            <Printer class="w-4 h-4 mr-2" />
+                            Imprimir
+                        </PrimaryButton>
+                    </div>
+                </div>
+
+                <!-- Report Results (Visible in Print) -->
+                <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-4 overflow-x-auto print:shadow-none print:p-0">
+                    
+                    <!-- Print Header -->
+                    <div class="hidden print:flex flex-col items-center mb-8 border-b-2 border-gray-800 pb-4">
+                        <!-- Logo de la Alcaldía -->
+                        <div class="mb-3">
+                            <img src="/images/logo_alcaldia_nindiri.png" alt="Logo Alcaldía Municipal de Nindirí" class="h-20 mx-auto object-contain" />
+                        </div>
+                        
+                        <!-- Encabezado Principal -->
+                        <h1 class="text-2xl font-bold text-gray-900 tracking-wide uppercase mb-1">
+                            ALCALDÍA MUNICIPAL DE NINDIRÍ
+                        </h1>
+                        
+                        <!-- Subtítulo -->
+                        <p class="text-base text-gray-700 font-medium mb-4">
+                            Departamento de Activos Fijos
+                        </p>
+                        
+                        <!-- Información del Reporte -->
+                        <div class="w-full flex justify-between items-end px-8 mt-2 border-t border-gray-300 pt-3">
+                            <div class="text-left">
+                                <p class="text-sm font-bold text-gray-800">REPORTE: <span class="uppercase font-normal">{{ reportType }}</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-gray-800">No. DOCUMENTO: <span class="font-mono text-base font-normal">{{ documentNumber }}</span></p>
+                                <p class="text-xs text-gray-500 mt-1">Generado el: {{ new Date().toLocaleDateString() }} {{ new Date().toLocaleTimeString() }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="reportData.length === 0" class="text-center py-8 text-gray-500">
+                        No se encontraron datos para los filtros seleccionados.
+                    </div>
+
+                    <table v-else class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th v-for="col in columns" :key="col" class="px-3 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    {{ col }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <tr v-for="(row, index) in reportData" :key="index">
+                                <td v-for="col in columns" :key="col" class="px-3 py-2 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                    {{ row[col] }}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot v-if="reportData.length > 0" class="bg-gray-100 dark:bg-gray-700 font-bold">
+                            <tr>
+                                <td v-for="(col, index) in columns" :key="col" class="px-3 py-3 text-gray-900 dark:text-white border-t-2 border-gray-300 dark:border-gray-600">
+                                    <span v-if="index === 0">TOTALES:</span>
+                                    <span v-else>{{ columnTotals[col] }}</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div></AuthenticatedLayout>
+</template>
+
+<style>
+/* Set margin to 0 to hide browser-generated headers/footers (URL, Date) */
+@media print {
+    @page { margin: 0; size: landscape; }
+    
+    /* Global Reset: Force everything to white background, black text, no shadows */
+    *, *:before, *:after {
+        background-color: transparent !important;
+        color: black !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    body {
+        background-color: white !important;
+        /* Add padding to body to simulate page margins since @page is 0 */
+        padding: 1cm !important;
+    }
+
+    /* Unset all layout constraints that might clip content */
+    body, #app, main, .min-h-screen, .flex, .flex-col, .flex-1, .overflow-hidden, .overflow-y-auto {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        position: static !important;
+        margin: 0 !important;
+    }
+
+    /* Hide sidebar and header explicitly */
+    aside, header, .print\:hidden {
+        display: none !important;
+    }
+
+    /* Ensure the Report Results container is visible */
+    .print\:block {
+        display: block !important;
+    }
+
+    /* Table Styling for Print */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        display: table !important;
+    }
+    
+    thead {
+        display: table-header-group !important;
+    }
+    
+    tr {
+        page-break-inside: avoid !important;
+    }
+
+    th, td {
+        border: 1px solid #ddd !important;
+        padding: 4px 8px !important;
+        text-align: left !important;
+    }
+
+    /* Remove screen-only decorative styles from the card */
+    .bg-white, .shadow, .sm\:rounded-lg {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+</style>
+
+

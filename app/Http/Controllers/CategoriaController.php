@@ -30,7 +30,14 @@ class CategoriaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['nombre' => 'required|string']);
+        $request->validate([
+            'nombre' => 'required|string',
+            'codigo' => 'required|string|max:20',
+            'porcentaje_valor_residual' => 'nullable|numeric|min:0|max:100',
+            'grupo_categoria' => 'nullable|string',
+            'subcategoria' => 'nullable|string',
+            'clase' => 'nullable|string',
+        ]);
         $this->service->create($request->all());
         return redirect()->route('categorias.index')->with('success', 'Categoría creada.');
     }
@@ -38,13 +45,20 @@ class CategoriaController extends Controller
     public function edit(string $id)
     {
         return Inertia::render('Catalogos/Categorias/Edit', [
-            'categoria' => new CategoriaResource($this->service->getById($id)),
+            'categoria' => (new CategoriaResource($this->service->getById($id)))->resolve(),
         ]);
     }
 
     public function update(Request $request, string $id)
     {
-        $request->validate(['nombre' => 'required|string']);
+        $request->validate([
+            'nombre' => 'required|string',
+            'codigo' => 'required|string|max:20',
+            'porcentaje_valor_residual' => 'nullable|numeric|min:0|max:100',
+            'grupo_categoria' => 'nullable|string',
+            'subcategoria' => 'nullable|string',
+            'clase' => 'nullable|string',
+        ]);
         $this->service->update($id, $request->all());
         return redirect()->route('categorias.index')->with('success', 'Categoría actualizada.');
     }

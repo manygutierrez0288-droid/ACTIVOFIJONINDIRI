@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivoFijo;
 use App\Http\Resources\ActivoFijoResource;
 use App\Http\Resources\CategoriaResource;
 use App\Http\Resources\DepartamentoResource;
@@ -18,6 +19,7 @@ use App\Services\ProveedorService;
 use App\Services\PersonalResponsableService;
 use App\Services\EstadoActivoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ActivoFijoController extends Controller
@@ -64,14 +66,19 @@ class ActivoFijoController extends Controller
     {
         $activos = $this->service->getAll();
 
-        // Basic filtering via query strings (for demonstration)
-        // In a real app, this would be more robust filter logic in the Repository
-
         return Inertia::render('Activos/Index', [
             'activos' => ActivoFijoResource::collection($activos),
             'filters' => $request->only(['search', 'categoria', 'departamento']),
             'categorias' => $this->categoriaService->getAll(),
             'departamentos' => $this->departamentoService->getAll(),
+            'ubicaciones' => $this->ubicacionService->getAll(),
+            'marcas' => $this->marcaService->getAll(),
+            'modelos' => $this->modeloService->getAll(),
+            'colores' => $this->colorService->getAll(),
+            'fuentes' => $this->fuenteService->getAll(),
+            'proveedores' => $this->proveedorService->getAll(),
+            'responsables' => $this->responsableService->getAll(),
+            'estados' => $this->estadoService->getAll(),
         ]);
     }
 
@@ -95,6 +102,7 @@ class ActivoFijoController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string',
+            'numero_serie' => 'nullable|string|max:100',
             'categoria_id' => 'required|exists:categorias,id',
             'departamento_id' => 'required|exists:departamentos,id',
             'ubicacion_id' => 'required|exists:ubicacions,id',
@@ -107,33 +115,58 @@ class ActivoFijoController extends Controller
             'estado_id' => 'required|exists:estado_activos,id',
             'fecha_adquisicion' => 'nullable|date',
             'valor_adquisicion' => 'nullable|numeric|min:0',
+            'vida_util_anios' => 'required|integer|min:0',
+            'valor_residual' => 'nullable|numeric|min:0',
+            'valor_residual_automatico' => 'boolean',
+            'imagen' => 'nullable|image|max:5120',
         ]);
 
-        $this->service->create($request->all());
+        $data = $request->all();
+        if ($request->hasFile('imagen')) {
+            $data['imagen_url'] = $request->file('imagen')->store('activos', 'public');
+        }
+
+        $this->service->create($data);
         return redirect()->route('activos.index')->with('success', 'Activo creado correctamente.');
+    }
+
+    public function show(string $id)
+    {
+        $activo = $this->service->getById($id);
+
+        // Get recent audit history
+        $auditorias = \App\Models\AuditoriaActivo::where('activo_fijo_id', $id)
+            ->with('usuario')
+            ->orderBy('fecha_hora', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($auditoria) {
+                return [
+                    'id' => $auditoria->id,
+                    'accion' => $auditoria->accion,
+                    'usuario' => $auditoria->usuario ? $auditoria->usuario->name : 'Sistema',
+                    'fecha_hora' => $auditoria->fecha_hora->format('d/m/Y H:i:s'),
+                    'valores_anteriores' => $auditoria->valores_anteriores,
+                    'valores_nuevos' => $auditoria->valores_nuevos,
+                ];
+            });
+
+        return Inertia::render('Activos/Show', [
+            'activo' => (new ActivoFijoResource($activo))->resolve(),
+            'auditorias' => $auditorias
+        ]);
     }
 
     public function edit(string $id)
     {
-        return Inertia::render('Activos/Edit', [
-            'activo' => $this->service->getById($id),
-            'categorias' => $this->categoriaService->getAll(),
-            'departamentos' => $this->departamentoService->getAll(),
-            'ubicaciones' => $this->ubicacionService->getAll(),
-            'marcas' => $this->marcaService->getAll(),
-            'modelos' => $this->modeloService->getAll(),
-            'colores' => $this->colorService->getAll(),
-            'fuentes' => $this->fuenteService->getAll(),
-            'proveedores' => $this->proveedorService->getAll(),
-            'responsables' => $this->responsableService->getAll(),
-            'estados' => $this->estadoService->getAll(),
-        ]);
+        return redirect()->route('activos.index', ['edit_id' => $id]);
     }
 
     public function update(Request $request, string $id)
     {
         $request->validate([
             'nombre' => 'required|string',
+            'numero_serie' => 'nullable|string|max:100',
             'categoria_id' => 'required|exists:categorias,id',
             'departamento_id' => 'required|exists:departamentos,id',
             'ubicacion_id' => 'required|exists:ubicacions,id',
@@ -146,9 +179,22 @@ class ActivoFijoController extends Controller
             'estado_id' => 'required|exists:estado_activos,id',
             'fecha_adquisicion' => 'nullable|date',
             'valor_adquisicion' => 'nullable|numeric|min:0',
+            'vida_util_anios' => 'required|integer|min:0',
+            'valor_residual' => 'nullable|numeric|min:0',
+            'valor_residual_automatico' => 'boolean',
+            'imagen' => 'nullable|image|max:5120',
         ]);
 
-        $this->service->update($id, $request->all());
+        $data = $request->all();
+        if ($request->hasFile('imagen')) {
+            $activo = $this->service->getById($id);
+            if ($activo->imagen_url) {
+                Storage::disk('public')->delete($activo->imagen_url);
+            }
+            $data['imagen_url'] = $request->file('imagen')->store('activos', 'public');
+        }
+
+        $this->service->update($id, $data);
         return redirect()->route('activos.index')->with('success', 'Activo actualizado correctamente.');
     }
 
@@ -156,5 +202,22 @@ class ActivoFijoController extends Controller
     {
         $this->service->delete($id);
         return redirect()->route('activos.index')->with('success', 'Activo eliminado.');
+    }
+
+    public function print(ActivoFijo $activoFijo)
+    {
+        $activoFijo->load(['categoria', 'departamento', 'ubicacion', 'marca', 'modelo', 'color', 'responsable', 'estado']);
+        return Inertia::render('Activos/Ficha', [
+            'activo' => (new ActivoFijoResource($activoFijo))->resolve(),
+        ]);
+    }
+
+    public function actaAsignacion(ActivoFijo $activo)
+    {
+        $activo->load(['categoria', 'departamento', 'ubicacion', 'marca', 'modelo', 'responsable.cargo']);
+        return Inertia::render('Activos/ActaAsignacion', [
+            'activo' => $activo,
+            'fecha_emision' => now()->format('d/m/Y'),
+        ]);
     }
 }

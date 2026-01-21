@@ -24,7 +24,7 @@ class EstadoActivoController extends Controller
     {
         $request->validate(['nombre' => 'required|string|unique:estado_activos']);
         $this->service->create($request->all());
-        return redirect()->route('estados.index');
+        return redirect()->route('estados.index')->with('success', 'Estado creado correctamente.');
     }
     public function edit(string $id)
     {
@@ -34,11 +34,11 @@ class EstadoActivoController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->update($id, $request->all());
-        return redirect()->route('estados.index');
+        return redirect()->route('estados.index')->with('success', 'Estado actualizado correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('estados.index');
+        return redirect()->route('estados.index')->with('success', 'Estado eliminado correctamente.');
     }
 }

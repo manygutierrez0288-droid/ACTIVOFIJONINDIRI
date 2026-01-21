@@ -18,6 +18,7 @@ class CategoriaFactory extends Factory
     {
         return [
             'nombre' => $this->faker->words(3, true),
+            'codigo' => strtoupper($this->faker->bothify('CAT-###')),
             'descripcion' => $this->faker->sentence(),
             'activo' => true,
         ];

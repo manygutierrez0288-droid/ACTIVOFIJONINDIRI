@@ -24,7 +24,7 @@ class MarcaController extends Controller
     {
         $request->validate(['nombre' => 'required|string|unique:marcas']);
         $this->service->create($request->all());
-        return redirect()->route('marcas.index');
+        return redirect()->route('marcas.index')->with('success', 'Marca creada correctamente.');
     }
     public function edit(string $id)
     {
@@ -34,11 +34,11 @@ class MarcaController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->update($id, $request->all());
-        return redirect()->route('marcas.index');
+        return redirect()->route('marcas.index')->with('success', 'Marca actualizada correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('marcas.index');
+        return redirect()->route('marcas.index')->with('success', 'Marca eliminada correctamente.');
     }
 }

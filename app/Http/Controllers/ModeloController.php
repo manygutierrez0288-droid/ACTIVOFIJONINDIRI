@@ -17,7 +17,10 @@ class ModeloController extends Controller
 
     public function index()
     {
-        return Inertia::render('Catalogos/Modelos/Index', ['modelos' => \App\Http\Resources\ModeloResource::collection($this->service->getAll())]);
+        return Inertia::render('Catalogos/Modelos/Index', [
+            'modelos' => \App\Http\Resources\ModeloResource::collection($this->service->getAll()),
+            'marcas' => $this->marcaService->getAll()
+        ]);
     }
     public function create()
     {
@@ -27,7 +30,7 @@ class ModeloController extends Controller
     {
         $request->validate(['nombre' => 'required', 'marca_id' => 'required|exists:marcas,id']);
         $this->service->create($request->all());
-        return redirect()->route('modelos.index');
+        return redirect()->route('modelos.index')->with('success', 'Modelo creado correctamente.');
     }
     public function edit(string $id)
     {
@@ -37,12 +40,12 @@ class ModeloController extends Controller
     {
         $request->validate(['nombre' => 'required', 'marca_id' => 'required|exists:marcas,id']);
         $this->service->update($id, $request->all());
-        return redirect()->route('modelos.index');
+        return redirect()->route('modelos.index')->with('success', 'Modelo actualizado correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('modelos.index');
+        return redirect()->route('modelos.index')->with('success', 'Modelo eliminado correctamente.');
     }
     public function getByMarca($marcaId)
     {

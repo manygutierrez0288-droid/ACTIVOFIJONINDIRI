@@ -50,4 +50,28 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'usuario_rol');
     }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->roles->contains('name', $role);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('Administrador') || $this->hasRole('admin');
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->roles->contains(function ($role) use ($permission) {
+            return $role->hasPermission($permission);
+        });
+    }
+
+    public function getAllPermissions(): \Illuminate\Support\Collection
+    {
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->unique('id');
+    }
 }

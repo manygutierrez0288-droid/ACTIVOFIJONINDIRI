@@ -38,7 +38,7 @@ class DepartamentoController extends Controller
     public function edit(string $id)
     {
         return Inertia::render('Catalogos/Departamentos/Edit', [
-            'departamento' => new DepartamentoResource($this->service->getById($id)),
+            'departamento' => (new DepartamentoResource($this->service->getById($id)))->resolve(),
         ]);
     }
 

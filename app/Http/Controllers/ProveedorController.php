@@ -24,7 +24,7 @@ class ProveedorController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->create($request->all());
-        return redirect()->route('proveedores.index');
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor creado correctamente.');
     }
     public function edit(string $id)
     {
@@ -34,11 +34,11 @@ class ProveedorController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->update($id, $request->all());
-        return redirect()->route('proveedores.index');
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor actualizado correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('proveedores.index');
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor eliminado correctamente.');
     }
 }

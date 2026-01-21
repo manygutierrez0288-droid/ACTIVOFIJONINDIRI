@@ -17,7 +17,10 @@ class PersonalResponsableController extends Controller
 
     public function index()
     {
-        return Inertia::render('Catalogos/PersonalResponsable/Index', ['responsables' => \App\Http\Resources\PersonalResponsableResource::collection($this->service->getAll())]);
+        return Inertia::render('Catalogos/PersonalResponsable/Index', [
+            'responsables' => \App\Http\Resources\PersonalResponsableResource::collection($this->service->getAll()),
+            'cargos' => $this->cargoService->getAll()
+        ]);
     }
     public function create()
     {
@@ -25,9 +28,13 @@ class PersonalResponsableController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate(['nombre' => 'required', 'cargo_id' => 'required|exists:cargos,id', 'numero_cedula' => 'required|unique:personal_responsables']);
+        $request->validate([
+            'nombre' => 'required',
+            'cargo_id' => 'required|exists:cargos,id',
+            'numero_cedula' => 'required|string|size:14|unique:personal_responsables,numero_cedula'
+        ]);
         $this->service->create($request->all());
-        return redirect()->route('responsables.index');
+        return redirect()->route('responsables.index')->with('success', 'Responsable creado correctamente.');
     }
     public function edit(string $id)
     {
@@ -38,13 +45,17 @@ class PersonalResponsableController extends Controller
     }
     public function update(Request $request, string $id)
     {
-        $request->validate(['nombre' => 'required', 'cargo_id' => 'required|exists:cargos,id']);
+        $request->validate([
+            'nombre' => 'required',
+            'cargo_id' => 'required|exists:cargos,id',
+            'numero_cedula' => 'required|string|size:14|unique:personal_responsables,numero_cedula,' . $id
+        ]);
         $this->service->update($id, $request->all());
-        return redirect()->route('responsables.index');
+        return redirect()->route('responsables.index')->with('success', 'Responsable actualizado correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('responsables.index');
+        return redirect()->route('responsables.index')->with('success', 'Responsable eliminado correctamente.');
     }
 }

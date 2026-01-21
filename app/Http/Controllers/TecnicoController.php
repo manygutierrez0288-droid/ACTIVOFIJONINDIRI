@@ -24,7 +24,7 @@ class TecnicoController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->create($request->all());
-        return redirect()->route('tecnicos.index');
+        return redirect()->route('tecnicos.index')->with('success', 'Técnico creado correctamente.');
     }
     public function edit(string $id)
     {
@@ -34,11 +34,11 @@ class TecnicoController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->update($id, $request->all());
-        return redirect()->route('tecnicos.index');
+        return redirect()->route('tecnicos.index')->with('success', 'Técnico actualizado correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('tecnicos.index');
+        return redirect()->route('tecnicos.index')->with('success', 'Técnico eliminado correctamente.');
     }
 }

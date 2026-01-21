@@ -10,11 +10,11 @@ return new class extends Migration {
         Schema::create('auditoria_activos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('activo_fijo_id')->constrained('activo_fijos')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
-            $table->string('tipo', 30);
-            $table->text('detalle')->nullable();
-            $table->dateTime('fecha')->useCurrent();
-            $table->timestamps();
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('restrict');
+            $table->string('accion'); // created, updated, deleted
+            $table->text('valores_anteriores')->nullable();
+            $table->text('valores_nuevos')->nullable();
+            $table->dateTime('fecha_hora');
         });
     }
 

@@ -11,6 +11,11 @@ class UserRepository extends BaseRepository
         parent::__construct($model);
     }
 
+    public function getAll()
+    {
+        return $this->model->with('roles')->get();
+    }
+
     public function syncRoles(User $user, array $roles)
     {
         return $user->roles()->sync($roles);

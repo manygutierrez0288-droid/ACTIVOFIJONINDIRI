@@ -21,6 +21,10 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
-        "flowbite": "^4.0.1"
+        "apexcharts": "^5.3.6",
+        "flowbite": "^4.0.1",
+        "lodash": "^4.17.21",
+        "lucide-vue-next": "^0.562.0",
+        "vue3-apexcharts": "^1.10.0"
     }
 }

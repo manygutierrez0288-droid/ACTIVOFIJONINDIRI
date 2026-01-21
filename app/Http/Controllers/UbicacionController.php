@@ -38,7 +38,7 @@ class UbicacionController extends Controller
     public function edit(string $id)
     {
         return Inertia::render('Catalogos/Ubicaciones/Edit', [
-            'ubicacion' => new UbicacionResource($this->service->getById($id)),
+            'ubicacion' => (new UbicacionResource($this->service->getById($id)))->resolve(),
         ]);
     }
 
@@ -51,7 +51,11 @@ class UbicacionController extends Controller
 
     public function destroy(string $id)
     {
-        $this->service->delete($id);
-        return redirect()->route('ubicaciones.index')->with('success', 'Ubicación eliminada.');
+        try {
+            $this->service->delete($id);
+            return redirect()->route('ubicaciones.index')->with('success', 'Ubicación eliminada.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }

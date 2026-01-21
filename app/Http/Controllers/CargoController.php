@@ -24,7 +24,7 @@ class CargoController extends Controller
     {
         $request->validate(['nombre' => 'required|string|unique:cargos']);
         $this->service->create($request->all());
-        return redirect()->route('cargos.index');
+        return redirect()->route('cargos.index')->with('success', 'Cargo creado correctamente.');
     }
     public function edit(string $id)
     {
@@ -34,11 +34,11 @@ class CargoController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->update($id, $request->all());
-        return redirect()->route('cargos.index');
+        return redirect()->route('cargos.index')->with('success', 'Cargo actualizado correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('cargos.index');
+        return redirect()->route('cargos.index')->with('success', 'Cargo eliminado correctamente.');
     }
 }

@@ -31,6 +31,18 @@ class UbicacionService extends BaseService
     }
     public function delete($id)
     {
+        $ubicacion = $this->repository->getById($id);
+
+        if ($ubicacion) {
+            if (
+                $ubicacion->activos()->exists() ||
+                $ubicacion->movimientosOrigen()->exists() ||
+                $ubicacion->movimientosDestino()->exists()
+            ) {
+                throw new \Exception("No se puede eliminar esta ubicación porque tiene activos o movimientos asociados.");
+            }
+        }
+
         return $this->repository->delete($id);
     }
 }

@@ -12,15 +12,15 @@ const props = defineProps({
 });
 
 const form = useForm({
-    name: props.user.name,
-    email: props.user.email,
+    name: props.user?.data?.name || props.user?.name || '',
+    email: props.user?.data?.email || props.user?.email || '',
     password: '',
     password_confirmation: '',
-    roles: props.user.roles.map(role => role.id),
+    roles: (props.user?.data?.roles?.data || props.user?.data?.roles || props.user?.roles?.data || props.user?.roles || []).map(role => role.id),
 });
 
 const submit = () => {
-    form.put(route('users.update', props.user.id));
+    form.put(route('users.update', props.user.data?.id || props.user.id));
 };
 </script>
 
@@ -32,8 +32,8 @@ const submit = () => {
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Editar Usuario</h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        
+            
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <form @submit.prevent="submit">
                         <div>
@@ -63,7 +63,7 @@ const submit = () => {
                         <div class="mt-4">
                             <InputLabel value="Roles" />
                             <div class="flex flex-wrap gap-4 mt-2">
-                                <label v-for="role in roles" :key="role.id" class="flex items-center space-x-2">
+                                <label v-for="role in (roles?.data || roles || [])" :key="role.id" class="flex items-center space-x-2">
                                     <input type="checkbox" :value="role.id" v-model="form.roles" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                                     <span class="text-gray-700 dark:text-gray-300 text-sm">{{ role.name }}</span>
                                 </label>
@@ -81,8 +81,7 @@ const submit = () => {
                             </PrimaryButton>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </AuthenticatedLayout>
+                </div></AuthenticatedLayout>
 </template>
+
+

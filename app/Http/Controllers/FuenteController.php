@@ -24,7 +24,7 @@ class FuenteController extends Controller
     {
         $request->validate(['nombre' => 'required|string|unique:fuentes']);
         $this->service->create($request->all());
-        return redirect()->route('fuentes.index');
+        return redirect()->route('fuentes.index')->with('success', 'Fuente creada correctamente.');
     }
     public function edit(string $id)
     {
@@ -34,11 +34,11 @@ class FuenteController extends Controller
     {
         $request->validate(['nombre' => 'required|string']);
         $this->service->update($id, $request->all());
-        return redirect()->route('fuentes.index');
+        return redirect()->route('fuentes.index')->with('success', 'Fuente actualizada correctamente.');
     }
     public function destroy(string $id)
     {
         $this->service->delete($id);
-        return redirect()->route('fuentes.index');
+        return redirect()->route('fuentes.index')->with('success', 'Fuente eliminada correctamente.');
     }
 }
