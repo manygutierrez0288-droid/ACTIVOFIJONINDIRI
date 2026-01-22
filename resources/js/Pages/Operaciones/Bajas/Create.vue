@@ -50,10 +50,10 @@ const submit = () => form.post(route('bajas.store'));
                                 <TextInput id="fecha" type="date" v-model="form.fecha" class="mt-1 block w-full" required />
                                 <InputError :message="form.errors.fecha" />
                             </div>
-                            <div>
-                                <InputLabel for="documento_respaldo" value="Referencia / Acta No." />
-                                <TextInput id="documento_respaldo" v-model="form.documento_respaldo" class="mt-1 block w-full" placeholder="Ej: ACTA-2025-045" />
-                                <InputError :message="form.errors.documento_respaldo" />
+                            <div class="flex items-end">
+                                <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-bold w-full border border-blue-100 dark:border-blue-800">
+                                    ℹ️ El número de acta correlativo será generado automáticamente por el sistema al finalizar.
+                                </div>
                             </div>
                         </div>
 

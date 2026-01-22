@@ -46,6 +46,7 @@ class ActivoFijoResource extends JsonResource
             'vida_util_anios' => $this->vida_util_anios,
             'valor_residual' => $this->valor_residual,
             'valor_residual_automatico' => $this->valor_residual_automatico,
+            'baja_id' => $this->bajas->first()?->id,
         ];
     }
 }

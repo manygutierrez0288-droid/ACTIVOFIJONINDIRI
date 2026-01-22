@@ -23,7 +23,8 @@ class ActivoFijoRepository extends BaseRepository
             'fuente',
             'proveedor',
             'responsable',
-            'estado'
+            'estado',
+            'bajas'
         ])->get();
     }
 
@@ -39,7 +40,8 @@ class ActivoFijoRepository extends BaseRepository
             'fuente',
             'proveedor',
             'responsable',
-            'estado'
+            'estado',
+            'bajas'
         ])->find($id);
     }
 }

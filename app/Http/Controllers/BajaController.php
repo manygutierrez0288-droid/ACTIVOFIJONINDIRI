@@ -41,7 +41,7 @@ class BajaController extends Controller
             $activo->update(['estado_id' => 6]);
         }
 
-        return redirect()->route('activos.index')->with('success', 'Activo dado de baja correctamente.');
+        return redirect()->route('bajas.acta-baja', $baja->id)->with('success', 'Activo dado de baja correctamente.');
     }
 
     public function actaBaja(BajaActivo $baja)

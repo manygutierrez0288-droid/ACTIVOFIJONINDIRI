@@ -387,6 +387,9 @@ onMounted(() => {
                                         <Eye class="w-3.5 h-3.5 mr-2 group-hover/btn:scale-110 transition-transform" /> DETALLES
                                     </Link>
                                     <div class="flex items-center gap-1">
+                                        <a v-if="item.baja_id" :href="route('bajas.acta-baja', item.baja_id)" target="_blank" class="p-2.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-xl transition-all" title="Ver Acta de Baja">
+                                            <FileText class="w-4.5 h-4.5" />
+                                        </a>
                                         <Link :href="route('activos.print', item.id)" target="_blank" class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 rounded-xl transition-all" title="Imprimir Ficha">
                                             <Printer class="w-4.5 h-4.5" />
                                         </Link>
@@ -459,6 +462,9 @@ onMounted(() => {
                                     </td>
                                     <td class="px-4 py-4 text-right sticky right-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-700/50 z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)] transition-colors">
                                         <div class="flex items-center justify-end gap-1">
+                                            <a v-if="item.baja_id" :href="route('bajas.acta-baja', item.baja_id)" target="_blank" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-all" title="Ver Acta de Baja">
+                                                <FileText class="w-4 h-4" />
+                                            </a>
                                             <Link :href="route('activos.show', item.id)" class="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-lg transition-all" title="Ver Detalles">
                                                 <Eye class="w-4 h-4" />
                                             </Link>

@@ -60,7 +60,12 @@ const formatCurrency = (value) => {
                                 <Link :href="route('mantenimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all text-nowrap">
                                     <Wrench class="w-3.5 h-3.5 mr-1.5" /> Mantenimiento
                                 </Link>
-                                <Link :href="route('bajas.create', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all text-nowrap">
+                                <template v-if="activo.estado_id === 6 && activo.baja_id">
+                                    <a :href="route('bajas.acta-baja', { baja: activo.baja_id })" target="_blank" class="inline-flex items-center px-3 py-2 bg-red-700 hover:bg-black text-white rounded-xl text-xs font-bold transition-all text-nowrap shadow-sm animate-pulse">
+                                        <FileText class="w-3.5 h-3.5 mr-1.5" /> ACTA DE BAJA
+                                    </a>
+                                </template>
+                                <Link v-else :href="route('bajas.create', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all text-nowrap">
                                     <Trash2 class="w-3.5 h-3.5 mr-1.5" /> Baja
                                 </Link>
                             </div>
