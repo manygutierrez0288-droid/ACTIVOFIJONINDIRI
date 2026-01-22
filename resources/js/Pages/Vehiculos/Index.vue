@@ -216,6 +216,13 @@ const deleteItem = () => {
     }
 };
 
+watch(() => form.categoria_id, (newCatId) => {
+    const cat = props.categorias.find(c => c.id == newCatId);
+    if (cat && !isEditing.value) {
+        form.vida_util_anios = cat.vida_util_anios ?? 5;
+    }
+});
+
 // Auto-calculate residual value (20%) when acquisition value changes
 watch(() => form.valor_adquisicion, (newValue) => {
     if (!isEditing.value) {
@@ -589,8 +596,11 @@ onMounted(() => {
                                         <InputError :message="form.errors.valor_adquisicion" />
                                     </div>
                                     <div class="space-y-2">
-                                        <InputLabel value="Vida Útil (Años)" class="text-xs font-bold uppercase text-gray-400" />
-                                        <TextInput type="number" v-model="form.vida_util_anios" class="w-full border-gray-200 rounded-xl focus:ring-indigo-500" />
+                                        <div class="flex justify-between items-center mb-1">
+                                            <InputLabel value="Vida Útil (Años)" class="text-xs font-bold uppercase text-gray-400" />
+                                            <span class="text-[9px] font-black text-indigo-500 uppercase tracking-tighter bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">Automático (5 Años)</span>
+                                        </div>
+                                        <TextInput type="number" v-model="form.vida_util_anios" disabled class="w-full border-gray-200 rounded-xl bg-gray-50/50 dark:bg-gray-900/50 opacity-70 cursor-not-allowed font-bold" />
                                         <InputError :message="form.errors.vida_util_anios" />
                                     </div>
                                     <div class="space-y-2">

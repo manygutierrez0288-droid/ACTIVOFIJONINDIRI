@@ -25,7 +25,8 @@ import {
     Calendar,
     Download,
     ArrowRightCircle,
-    CheckCircle2
+    CheckCircle2,
+    ShieldCheck
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -42,7 +43,8 @@ const reportOptions = [
     { id: 'inventario', label: 'Inventario General', desc: 'Listado completo y detallado de todos los activos fijos registrados.', icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
     { id: 'depreciacion', label: 'Cálculo Depreciación', desc: 'Análisis del valor actual, desgaste acumulado y proyección contable.', icon: BarChart3, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
     { id: 'categoria', label: 'Por Categoría', desc: 'Clasificación organizada de bienes según su naturaleza técnica.', icon: Layers, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-    { id: 'acciones', label: 'Historial de Acciones', desc: 'Auditoría completa de movimientos, cambios y gestiones realizadas.', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+    { id: 'acciones', label: 'Movimientos y Gestiones', desc: 'Auditoría completa de movimientos, cambios y gestiones realizadas.', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+    { id: 'auditoria_sistema', label: 'Auditoría de Cambios', desc: 'Registro técnico detallado de modificaciones en campos y datos por usuario.', icon: ShieldCheck, color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20' },
     { id: 'libro_activos', label: 'Libro de Activos', desc: 'Registro pormenorizado para cumplimiento de normativas externas.', icon: BookOpen, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
     { id: 'resumen_mensual', label: 'Resumen Mensual', desc: 'Consolidado de altas y bajas durante el ciclo de operación actual.', icon: CalendarDays, color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
     { id: 'vehiculos', label: 'Flota Vehicular', desc: 'Detalle técnico y operativo de todos los vehículos asignados.', icon: Printer, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },

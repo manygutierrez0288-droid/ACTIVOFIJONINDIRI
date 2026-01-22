@@ -32,7 +32,9 @@ import {
     FileCheck,
     X,
     Camera,
-    AlertCircle
+    AlertCircle,
+    LayoutGrid,
+    List
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -54,6 +56,11 @@ const props = defineProps({
 const search = ref(props.filters?.search || '');
 const categoriaFilter = ref(props.filters?.categoria || '');
 const departamentoFilter = ref(props.filters?.departamento || '');
+const viewMode = ref(localStorage.getItem('siafnin_activos_view') || 'table');
+
+watch(viewMode, (newMode) => {
+    localStorage.setItem('siafnin_activos_view', newMode);
+});
 
 const applyFilters = () => {
     router.get(route('activos.index'), {
@@ -104,9 +111,9 @@ watch(
     ([newValor, newCatId, newAuto]) => {
         const cat = props.categorias.find(c => c.id == newCatId);
         
-        // Auto-fill vida_util_anios if it's a new or changed category
+        // Forzar 5 años excepto si la categoría indica 0 (Terrenos)
         if (cat && !isEditing.value) {
-            form.vida_util_anios = cat.vida_util_anios || 5;
+            form.vida_util_anios = (cat.vida_util_anios === 0) ? 0 : 5;
         }
 
         if (newAuto) {
@@ -276,6 +283,26 @@ onMounted(() => {
                                     <option v-for="dep in departamentos" :key="dep.id" :value="dep.id">{{ dep.nombre }}</option>
                                 </select>
                             </div>
+                            
+                            <!-- View Toggle -->
+                            <div class="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+                                <button 
+                                    @click="viewMode = 'table'" 
+                                    :class="[viewMode === 'table' ? 'bg-white dark:bg-gray-700 text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600']"
+                                    class="p-2 rounded-lg transition-all"
+                                    title="Vista de Tabla"
+                                >
+                                    <List class="w-4 h-4" />
+                                </button>
+                                <button 
+                                    @click="viewMode = 'grid'" 
+                                    :class="[viewMode === 'grid' ? 'bg-white dark:bg-gray-700 text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600']"
+                                    class="p-2 rounded-lg transition-all"
+                                    title="Vista de Cuadrícula"
+                                >
+                                    <LayoutGrid class="w-4 h-4" />
+                                </button>
+                            </div>
 
                             <div class="w-full lg:w-auto lg:ml-auto">
                                 <button @click="openCreateModal" class="w-full lg:w-auto flex items-center justify-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 font-bold rounded-lg text-sm px-5 py-2.5 shadow-md transition-all active:scale-95">
@@ -286,8 +313,97 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <!-- Table -->
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-xl border border-gray-100 dark:border-gray-700">
+                    <!-- Grid View Container -->
+                    <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+                        <div v-for="item in activos.data" :key="item.id" 
+                            class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-full"
+                        >
+                            <!-- Image Section -->
+                            <div class="relative h-56 overflow-hidden">
+                                <img v-if="item.imagen_url" :src="item.imagen_url" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div v-else class="w-full h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/50 text-gray-300">
+                                    <ImageIcon class="w-12 h-12 mb-2 opacity-20" />
+                                    <span class="text-[10px] uppercase font-black tracking-widest opacity-40">Sin Fotografía</span>
+                                </div>
+                                
+                                <!-- Floating Badges -->
+                                <div class="absolute top-4 left-4 flex flex-col gap-2">
+                                    <span class="px-3 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">
+                                        {{ item.categoria }}
+                                    </span>
+                                </div>
+                                
+                                <div class="absolute top-4 right-4">
+                                    <span class="px-3 py-1 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm" :class="[
+                                        item.estado_nombre?.toLowerCase().includes('buen') ? 'bg-green-500/90 text-white' :
+                                        item.estado_nombre?.toLowerCase().includes('regu') ? 'bg-yellow-500/90 text-white' :
+                                        'bg-red-500/90 text-white'
+                                    ]">
+                                        {{ item.estado_nombre }}
+                                    </span>
+                                </div>
+                                
+                                <!-- Price Tag overlay -->
+                                <div class="absolute bottom-4 left-4">
+                                    <div class="px-3 py-1.5 bg-black/60 backdrop-blur-md text-white rounded-xl text-xs font-black">
+                                        {{ formatCurrency(item.valor_neto) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Content Section -->
+                            <div class="p-6 flex-1 flex flex-col">
+                                <div class="mb-4">
+                                    <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-1.5 font-mono">{{ item.codigo_inventario }}</p>
+                                    <h3 class="text-lg font-black text-gray-900 dark:text-white leading-tight uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 min-h-[3rem]">{{ item.nombre }}</h3>
+                                    <p class="text-xs font-medium text-gray-400 mt-1 uppercase">{{ item.marca || 'N/A' }} <span v-if="item.modelo"> | {{ item.modelo }}</span></p>
+                                </div>
+
+                                <div class="space-y-3 pt-4 border-t border-gray-50 dark:border-gray-700/50 grow">
+                                    <div class="flex items-start gap-3">
+                                        <div class="p-1.5 bg-gray-50/80 dark:bg-gray-700/50 rounded-lg text-gray-400">
+                                            <MapPin class="w-3.5 h-3.5" />
+                                        </div>
+                                        <div>
+                                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Ubicación Actual</p>
+                                            <p class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ item.ubicacion }}</p>
+                                            <p class="text-[10px] text-gray-400 leading-tight">{{ item.departamento }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-3">
+                                        <div class="p-1.5 bg-gray-50/80 dark:bg-gray-700/50 rounded-lg text-gray-400">
+                                            <User class="w-3.5 h-3.5" />
+                                        </div>
+                                        <div>
+                                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Custodio</p>
+                                            <p class="text-xs font-bold text-gray-700 dark:text-gray-300 truncate w-full">{{ item.responsable || 'No asignado' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="mt-6 flex items-center justify-between gap-2 pt-4 border-t border-gray-100 dark:border-gray-700/50">
+                                    <Link :href="route('activos.show', item.id)" class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-xl text-xs font-black transition-all group/btn">
+                                        <Eye class="w-3.5 h-3.5 mr-2 group-hover/btn:scale-110 transition-transform" /> DETALLES
+                                    </Link>
+                                    <div class="flex items-center gap-1">
+                                        <Link :href="route('activos.print', item.id)" target="_blank" class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 rounded-xl transition-all" title="Imprimir Ficha">
+                                            <Printer class="w-4.5 h-4.5" />
+                                        </Link>
+                                        <button @click="openEditModal(item)" class="p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-xl transition-all" title="Editar">
+                                            <Edit3 class="w-4.5 h-4.5" />
+                                        </button>
+                                        <button @click="confirmDeletion(item.id)" class="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-xl transition-all" title="Eliminar">
+                                            <Trash2 class="w-4.5 h-4.5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table (Wrapped in Condition) -->
+                    <div v-if="viewMode === 'table'" class="relative overflow-x-auto shadow-md sm:rounded-xl border border-gray-100 dark:border-gray-700">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
@@ -654,8 +770,13 @@ onMounted(() => {
                                     </div>
 
                                     <div class="space-y-2">
-                                        <InputLabel for="vida_util_anios" value="Vida Útil (Años)" class="text-[10px] font-bold uppercase text-gray-400" />
-                                        <input id="vida_util_anios" type="number" v-model="form.vida_util_anios" placeholder="Ej: 5" class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm focus:ring-indigo-500 transition-all">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <InputLabel for="vida_util_anios" value="Vida Útil (Años)" class="text-[10px] font-bold uppercase text-gray-400" />
+                                            <span class="text-[9px] font-black text-indigo-500 uppercase tracking-tighter bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">
+                                                {{ form.vida_util_anios == 0 ? 'No Depreciable' : 'Regla Institucional (5 Años)' }}
+                                            </span>
+                                        </div>
+                                        <input id="vida_util_anios" type="number" v-model="form.vida_util_anios" disabled class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm bg-gray-50/50 dark:bg-gray-800/50 opacity-70 cursor-not-allowed font-bold">
                                         <InputError :message="form.errors.vida_util_anios" />
                                     </div>
 

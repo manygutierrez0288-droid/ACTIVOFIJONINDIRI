@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AuditoriaActivo;
 use App\Models\ActivoFijo;
 use App\Models\Mantenimiento;
 use App\Models\Movimiento;
@@ -62,6 +63,29 @@ class ReporteService
                     });
 
                 return $movimientos->concat($mantenimientos)->sortByDesc('Fecha')->values();
+
+            case 'auditoria_sistema':
+                $queryAuditoria = AuditoriaActivo::with(['usuario', 'activoFijo']);
+
+                if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
+                    $queryAuditoria->whereBetween('fecha_hora', [$filters['fecha_inicio'] . ' 00:00:00', $filters['fecha_fin'] . ' 23:59:59']);
+                }
+
+                return $queryAuditoria->orderBy('fecha_hora', 'desc')->get()->map(function ($audit) {
+                    return [
+                        'Fecha' => $audit->fecha_hora->format('d/m/Y H:i'),
+                        'Usuario' => $audit->usuario->name ?? 'Sistema',
+                        'Accion' => match (strtolower($audit->accion)) {
+                            'created' => 'CREADO',
+                            'updated' => 'MODIFICADO',
+                            'deleted' => 'ELIMINADO',
+                            default => strtoupper($audit->accion)
+                        },
+                        'Activo' => $audit->activoFijo->nombre ?? 'N/A',
+                        'ID Activo' => $audit->activo_fijo_id,
+                        'Resumen' => $this->summarizeChanges($audit->valores_anteriores, $audit->valores_nuevos, $audit->accion)
+                    ];
+                });
 
             case 'categoria':
                 return $query->get()->groupBy('categoria.nombre')->map(function ($items, $categoria) {
@@ -146,6 +170,78 @@ class ReporteService
         if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
             $query->whereBetween('fecha_adquisicion', [$filters['fecha_inicio'], $filters['fecha_fin']]);
         }
+    }
+
+    private function summarizeChanges($anteriores, $nuevos, $accion = 'updated')
+    {
+        if (!$nuevos)
+            return 'N/A';
+
+        $anteriores = is_array($anteriores) ? $anteriores : (json_decode((string) $anteriores, true) ?: []);
+        $nuevos = is_array($nuevos) ? $nuevos : (json_decode((string) $nuevos, true) ?: []);
+
+        // Simplificar para creación
+        if (strtolower($accion) === 'created') {
+            return "REGISTRO INICIAL COMPLETO | CÓDIGO: [" . ($nuevos['codigo_inventario'] ?? 'N/A') . "]";
+        }
+
+        $cambios = [];
+        $ignore = ['updated_at', 'created_at', 'id', 'user_id', 'user_creacion_id', 'user_modificacion_id', 'activo_fijo_id', 'valor_residual_automatico'];
+
+        foreach ($nuevos as $key => $val) {
+            if (in_array($key, $ignore))
+                continue;
+
+            $oldVal = $anteriores[$key] ?? 'NUEVO';
+            if ($oldVal != $val) {
+                // Traducir nombre de campo y quitar _id
+                $label = strtoupper(str_replace('_id', '', $key));
+
+                // Resolver IDs a nombres
+                $resolvedOld = $this->resolveId($key, $oldVal);
+                $resolvedNew = $this->resolveId($key, $val);
+
+                $cambios[] = "$label: [$resolvedOld] -> [$resolvedNew]";
+            }
+        }
+
+        return count($cambios) > 0 ? implode(" | ", $cambios) : 'Sin cambios detectables';
+    }
+
+    private function resolveId($campo, $valor)
+    {
+        if ($valor === 'NUEVO' || $valor === null || $valor === '')
+            return $valor ?: 'NINGUNO';
+        if (!str_ends_with($campo, '_id'))
+            return $valor;
+
+        try {
+            switch ($campo) {
+                case 'categoria_id':
+                    return \App\Models\Categoria::find($valor)->nombre ?? $valor;
+                case 'departamento_id':
+                    return \App\Models\Departamento::find($valor)->nombre ?? $valor;
+                case 'ubicacion_id':
+                    return \App\Models\Ubicacion::find($valor)->nombre ?? $valor;
+                case 'responsable_id':
+                    return \App\Models\PersonalResponsable::find($valor)->nombre ?? $valor;
+                case 'marca_id':
+                    return \App\Models\Marca::find($valor)->nombre ?? $valor;
+                case 'modelo_id':
+                    return \App\Models\Modelo::find($valor)->nombre ?? $valor;
+                case 'color_id':
+                    return \App\Models\Color::find($valor)->nombre ?? $valor;
+                case 'estado_id':
+                    return \App\Models\EstadoActivo::find($valor)->nombre ?? $valor;
+                case 'fuente_id':
+                    return \App\Models\Fuente::find($valor)->nombre ?? $valor;
+                case 'proveedor_id':
+                    return \App\Models\Proveedor::find($valor)->nombre ?? $valor;
+            }
+        } catch (\Exception $e) {
+            return $valor;
+        }
+        return $valor;
     }
 
     public function generateCsv($data)

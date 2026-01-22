@@ -13,9 +13,9 @@ class NewCategoriesSeeder extends Seeder
     public function run(): void
     {
         $categorias = [
-            ['codigo' => '1000-1-01', 'nombre' => 'Terrenos urbanos', 'grupo_categoria' => 'Terrenos', 'subcategoria' => 'Bienes Tangibles', 'clase' => '1'],
-            ['codigo' => '1000-1-02', 'nombre' => 'Terrenos rurales', 'grupo_categoria' => 'Terrenos', 'subcategoria' => 'Bienes Tangibles', 'clase' => '2'],
-            ['codigo' => '1000-1-03', 'nombre' => 'Áreas verdes públicas', 'grupo_categoria' => 'Terrenos', 'subcategoria' => 'Bienes Tangibles', 'clase' => '3'],
+            ['codigo' => '1000-1-01', 'nombre' => 'Terrenos urbanos', 'grupo_categoria' => 'Terrenos', 'subcategoria' => 'Bienes Tangibles', 'clase' => '1', 'vida_util_anios' => 0],
+            ['codigo' => '1000-1-02', 'nombre' => 'Terrenos rurales', 'grupo_categoria' => 'Terrenos', 'subcategoria' => 'Bienes Tangibles', 'clase' => '2', 'vida_util_anios' => 0],
+            ['codigo' => '1000-1-03', 'nombre' => 'Áreas verdes públicas', 'grupo_categoria' => 'Terrenos', 'subcategoria' => 'Bienes Tangibles', 'clase' => '3', 'vida_util_anios' => 0],
 
             ['codigo' => '1100-1-01', 'nombre' => 'Edificio municipal', 'grupo_categoria' => 'Edificaciones e Infraestructura', 'subcategoria' => 'Bienes Tangibles', 'clase' => '1'],
             ['codigo' => '1100-1-02', 'nombre' => 'Mercado municipal', 'grupo_categoria' => 'Edificaciones e Infraestructura', 'subcategoria' => 'Bienes Tangibles', 'clase' => '2'],
@@ -77,6 +77,7 @@ class NewCategoriesSeeder extends Seeder
                     'grupo_categoria' => $cat['grupo_categoria'],
                     'subcategoria' => $cat['subcategoria'],
                     'clase' => $cat['clase'],
+                    'vida_util_anios' => $cat['vida_util_anios'] ?? 5,
                     'activo' => true
                 ]
             );

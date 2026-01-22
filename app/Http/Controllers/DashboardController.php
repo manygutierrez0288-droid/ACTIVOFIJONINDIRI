@@ -16,10 +16,11 @@ class DashboardController extends Controller
         $totalActivos = ActivoFijo::count();
 
         // 2. Valor Total de los Activos (suma de valores de adquisición)
-        $valorTotal = ActivoFijo::sum('valor_adquisicion');
+        $activos = ActivoFijo::all();
+        $valorTotal = $activos->sum('valor_adquisicion');
 
-        // 3. Valor Total de la Depreciación Acumulada
-        $depreciacionTotal = ActivoFijo::sum('depreciacion_acumulada');
+        // 3. Valor Total de la Depreciación Acumulada (Calculada dinámicamente)
+        $depreciacionTotal = $activos->sum('depreciacion_acumulada_calculada');
 
         // 4. Valor Neto de los Activos
         $valorNeto = $valorTotal - $depreciacionTotal;
@@ -80,8 +81,8 @@ class DashboardController extends Controller
                     'nombre' => $activo->nombre,
                     'valor_adquisicion' => $activo->valor_adquisicion,
                     'fecha_adquisicion' => $activo->fecha_adquisicion ? \Carbon\Carbon::parse($activo->fecha_adquisicion)->format('d/m/Y') : 'N/A',
-                    'depreciacion_acumulada' => $activo->depreciacion_acumulada,
-                    'valor_neto' => $activo->valor_adquisicion - $activo->depreciacion_acumulada,
+                    'depreciacion_acumulada' => $activo->depreciacion_acumulada_calculada,
+                    'valor_neto' => $activo->valor_neto_calculado,
                     'estado' => $activo->estado ? $activo->estado->nombre : 'N/A',
                     'categoria' => $activo->categoria ? $activo->categoria->nombre : 'N/A',
                 ];

@@ -24,7 +24,6 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         \App\Models\ActivoFijo::observe(\App\Observers\ActivoFijoObserver::class);
-        \App\Models\ActivoFijo::observe(\App\Observers\AuditoriaObserver::class);
         \App\Models\Mantenimiento::observe(\App\Observers\MantenimientoObserver::class);
         \App\Models\BajaActivo::observe(\App\Observers\BajaObserver::class);
         \App\Models\Movimiento::observe(\App\Observers\MovimientoObserver::class);

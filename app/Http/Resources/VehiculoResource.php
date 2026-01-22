@@ -47,6 +47,12 @@ class VehiculoResource extends JsonResource
             'proveedor_id' => $this->activoFijo->proveedor_id,
             'responsable_id' => $this->activoFijo->responsable_id,
             'estado_id' => $this->activoFijo->estado_id,
+
+            // Calculated Depreciation Fields
+            'depreciacion_anual' => $this->activoFijo->depreciacion_anual,
+            'depreciacion_mensual' => $this->activoFijo->depreciacion_mensual,
+            'depreciacion_acumulada' => $this->activoFijo->depreciacion_acumulada_calculada,
+            'meses_depreciados' => $this->activoFijo->meses_depreciados,
             'vida_util_anios' => $this->activoFijo->vida_util_anios,
             'valor_residual' => $this->activoFijo->valor_residual,
         ];
