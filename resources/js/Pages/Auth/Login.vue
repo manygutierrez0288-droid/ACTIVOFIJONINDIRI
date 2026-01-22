@@ -133,17 +133,6 @@ const submit = () => {
             </div>
         </form>
 
-        <!-- Register Link -->
-        <div class="mt-10 pt-6 border-t border-gray-100 text-center">
-            <p class="text-sm text-gray-500 font-bold">
-                ¿No tienes una cuenta?
-                <Link
-                    :href="route('register')"
-                    class="ml-1 text-indigo-600 hover:text-indigo-800 transition-colors underline decoration-indigo-200 underline-offset-4"
-                >
-                    Regístrate aquí
-                </Link>
-            </p>
-        </div>
+        <!-- Register Link Removed for Security -->
     </GuestLayout>
 </template>

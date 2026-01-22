@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { 
     LayoutDashboard, 
     DollarSign, 
@@ -35,31 +35,65 @@ const categoryChartOptions = computed(() => ({
     chart: {
         type: 'bar',
         toolbar: { show: false },
-        fontFamily: 'Inter, sans-serif'
+        fontFamily: 'Inter, sans-serif',
+        animations: { enabled: true, easing: 'easeinout', speed: 800 }
     },
     plotOptions: {
         bar: {
-            borderRadius: 4,
+            borderRadius: 6,
             horizontal: true,
-            barHeight: '70%',
-            distributed: true
+            barHeight: '65%',
+            distributed: true,
+            dataLabels: {
+                position: 'bottom'
+            }
         }
     },
-    dataLabels: { enabled: false },
+    dataLabels: {
+        enabled: true,
+        textAnchor: 'start',
+        style: {
+            colors: ['#fff'],
+            fontWeight: 700,
+            fontSize: '11px'
+        },
+        formatter: function (val) {
+            return val;
+        },
+        offsetX: 0,
+        dropShadow: { enabled: true }
+    },
     xaxis: {
         categories: (props.activos_por_categoria || []).map(item => item.categoria),
         labels: {
-            style: { colors: '#6B7280', fontSize: '12px' }
-        }
+            show: true,
+            style: { colors: '#9CA3AF', fontSize: '11px', fontWeight: 500 },
+            formatter: (val) => Math.floor(val)
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        tickAmount: Math.max(...(props.activos_por_categoria || []).map(item => item.total), 1)
     },
     yaxis: {
         labels: {
-            style: { colors: '#6B7280', fontSize: '12px' }
+            show: true,
+            maxWidth: 160,
+            style: { colors: '#4B5563', fontSize: '12px', fontWeight: 600 }
         }
     },
-    colors: ['#3F83F8', '#0E9F6E', '#F05252', '#FF5A1F', '#7E3AF2', '#6366F1', '#EC4899', '#14B8A6'],
-    grid: { borderColor: '#F3F4F6', strokeDashArray: 4 },
-    tooltip: { theme: 'light' },
+    colors: ['#6366F1', '#10B981', '#F43F5E', '#F59E0B', '#8B5CF6', '#3B82F6', '#EC4899', '#14B8A6'],
+    grid: {
+        show: true,
+        borderColor: '#F3F4F6',
+        xaxis: { lines: { show: true } },
+        yaxis: { lines: { show: false } }
+    },
+    tooltip: { 
+        theme: 'light',
+        y: {
+            formatter: (val) => val
+        }
+    },
     legend: { show: false }
 }));
 
@@ -74,34 +108,54 @@ const evolutionChartOptions = computed(() => ({
         type: 'area',
         toolbar: { show: false },
         fontFamily: 'Inter, sans-serif',
-        zoom: { enabled: false }
+        zoom: { enabled: false },
+        sparkline: { enabled: false }
     },
     dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 3 },
+    stroke: { curve: 'smooth', width: 4, colors: ['#4F46E5'] },
     xaxis: {
         categories: (props.evolucion_mensual || []).map(item => item.mes),
-        labels: { style: { colors: '#6B7280', fontSize: '12px' } },
+        labels: { 
+            style: { colors: '#9CA3AF', fontSize: '11px', fontWeight: 500 },
+            offsetY: 0
+        },
         axisBorder: { show: false },
         axisTicks: { show: false }
     },
     yaxis: {
         labels: {
-            formatter: (val) => new Intl.NumberFormat('es-NI', { notation: "compact", compactDisplay: "short" }).format(val),
-            style: { colors: '#6B7280', fontSize: '12px' }
+            formatter: (val) => formatCurrency(val).replace('NIO', '').trim(),
+            style: { colors: '#9CA3AF', fontSize: '11px' }
         }
     },
     fill: {
         type: 'gradient',
         gradient: {
             shadeIntensity: 1,
-            opacityFrom: 0.7,
-            opacityTo: 0.2,
-            stops: [0, 90, 100]
+            opacityFrom: 0.45,
+            opacityTo: 0.05,
+            stops: [20, 100],
+            colorStops: [
+                { offset: 0, color: '#4F46E5', opacity: 0.4 },
+                { offset: 100, color: '#4F46E5', opacity: 0 }
+            ]
         }
     },
-    colors: ['#1C64F2'],
-    grid: { borderColor: '#F3F4F6', strokeDashArray: 4 },
-    tooltip: { theme: 'light', y: { formatter: (val) => formatCurrency(val) } }
+    colors: ['#4F46E5'],
+    grid: { 
+        borderColor: '#F3F4F6', 
+        strokeDashArray: 4,
+        padding: { left: 10, right: 10 }
+    },
+    markers: {
+        size: 0,
+        hover: { size: 6 }
+    },
+    tooltip: { 
+        theme: 'light', 
+        x: { show: true },
+        y: { formatter: (val) => formatCurrency(val) } 
+    }
 }));
 
 const evolutionChartSeries = computed(() => [{
@@ -109,29 +163,44 @@ const evolutionChartSeries = computed(() => [{
     data: (props.evolucion_mensual || []).map(item => item.total)
 }]);
 
+const hoveredStatus = ref(null);
+
 // Gráfico de Estado (Donut/Pastel)
 const statusChartOptions = computed(() => ({
     chart: { 
         type: 'donut',
-        fontFamily: 'Inter, sans-serif'
+        fontFamily: 'Inter, sans-serif',
+        events: {
+            dataPointMouseEnter: function(event, chartContext, config) {
+                const index = config.dataPointIndex;
+                if (props.activos_por_estado && props.activos_por_estado[index]) {
+                    hoveredStatus.value = {
+                        label: props.activos_por_estado[index].estado,
+                        value: props.activos_por_estado[index].total
+                    };
+                }
+            },
+            dataPointMouseLeave: function() {
+                hoveredStatus.value = null;
+            }
+        },
+        toolbar: { show: false }
     },
     labels: (props.activos_por_estado || []).map(item => item.estado),
     colors: ['#0E9F6E', '#E3A008', '#F05252', '#3F83F8', '#9CA3AF'],
     plotOptions: {
         pie: {
             donut: {
-                size: '65%',
+                size: '75%',
                 labels: {
-                    show: true,
-                    name: { show: true },
-                    value: { show: true, fontSize: '20px', fontWeight: 600 }
+                    show: false, // Ocultamos los labels nativos para usar nuestro overlay
                 }
             }
         }
     },
     legend: { position: 'bottom', fontFamily: 'Inter, sans-serif' },
     dataLabels: { enabled: false },
-    tooltip: { theme: 'light' }
+    tooltip: { enabled: false }
 }));
 
 const statusChartSeries = computed(() => (props.activos_por_estado || []).map(item => item.total));
@@ -272,7 +341,7 @@ export default {
                                 Estado de Activos
                             </h3>
                         </div>
-                        <div class="h-64 flex items-center justify-center">
+                        <div class="h-64 flex items-center justify-center relative">
                             <apexchart 
                                 v-if="activos_por_estado.length > 0"
                                 width="100%" 
@@ -281,6 +350,15 @@ export default {
                                 :options="statusChartOptions" 
                                 :series="statusChartSeries" 
                             />
+                            <!-- Overlay del Centro -->
+                            <div v-if="activos_por_estado.length > 0" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mb-6">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 transition-all duration-300">
+                                    {{ hoveredStatus?.label || 'Total' }}
+                                </span>
+                                <span class="text-3xl font-black text-gray-900 dark:text-white transition-all duration-300" :key="hoveredStatus?.label">
+                                    {{ hoveredStatus?.value || stats.total_activos }}
+                                </span>
+                            </div>
                             <div v-else class="text-center text-gray-500 dark:text-gray-400">
                                 <AlertCircle class="w-8 h-8 mx-auto mb-2 text-gray-300" />
                                 <p class="text-sm">No hay datos disponibles</p>
@@ -327,46 +405,61 @@ export default {
                         <table class="w-full text-sm text-left">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
                                 <tr>
-                                    <th class="px-6 py-2">Activo</th>
-                                    <th class="px-6 py-2">Categoría</th>
-                                    <th class="px-6 py-2">Estado</th>
-                                    <th class="px-6 py-2 text-right">Valor Adq.</th>
-                                    <th class="px-6 py-2 text-right">Valor Neto</th>
-                                    <th class="px-6 py-2 text-center">Fecha</th>
+                                    <th class="px-6 py-4">Activo</th>
+                                    <th class="px-6 py-4">Categoría</th>
+                                    <th class="px-6 py-4">Estado</th>
+                                    <th class="px-6 py-4 text-right">Valor Neto</th>
+                                    <th class="px-6 py-4 text-center">Fecha</th>
+                                    <th class="px-6 py-4 text-center">Acción</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                                <tr v-for="activo in activos_recientes" :key="activo.id" class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <td class="px-6 py-2 font-medium text-gray-900 dark:text-white">
-                                        {{ activo.nombre }}
+                                <tr v-for="activo in activos_recientes" :key="activo.id" class="hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors group">
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+                                                {{ activo.nombre }}
+                                            </span>
+                                            <span class="text-xs text-gray-400 font-medium">Ref: #{{ activo.id }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/50">
                                             {{ activo.categoria }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span v-if="activo.estado?.toLowerCase().includes('buen')" class="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-xs font-medium">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> {{ activo.estado }}
+                                        <span v-if="activo.estado?.toLowerCase().includes('buen')" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span> {{ activo.estado }}
                                         </span>
-                                        <span v-else-if="activo.estado?.toLowerCase().includes('regular')" class="flex items-center gap-1.5 text-yellow-600 dark:text-yellow-400 text-xs font-medium">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> {{ activo.estado }}
+                                        <span v-else-if="activo.estado?.toLowerCase().includes('regular')" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-100 dark:border-amber-800/50">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2"></span> {{ activo.estado }}
                                         </span>
-                                        <span v-else-if="activo.estado?.toLowerCase().includes('mal')" class="flex items-center gap-1.5 text-red-600 dark:text-red-400 text-xs font-medium">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> {{ activo.estado }}
-                                        </span>
-                                        <span v-else class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 text-xs font-medium">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span> {{ activo.estado }}
+                                        <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-100 dark:border-rose-800/50">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2"></span> {{ activo.estado }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-right text-gray-900 dark:text-white font-medium">
-                                        {{ formatCurrency(activo.valor_adquisicion) }}
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="text-sm font-black text-gray-900 dark:text-white">
+                                            {{ formatCurrency(activo.valor_neto) }}
+                                        </span>
                                     </td>
-                                    <td class="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400 font-bold">
-                                        {{ formatCurrency(activo.valor_neto) }}
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md">
+                                            {{ activo.fecha_adquisicion }}
+                                        </span>
                                     </td>
-                                    <td class="px-6 py-4 text-center text-gray-500 text-xs">
-                                        {{ activo.fecha_adquisicion }}
+                                    <td class="px-6 py-4 text-center">
+                                        <Link 
+                                            :href="route('activos.show', activo.id)"
+                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all duration-200 shadow-sm"
+                                            title="Ver Detalle"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </Link>
                                     </td>
                                 </tr>
                                 <tr v-if="activos_recientes.length === 0">

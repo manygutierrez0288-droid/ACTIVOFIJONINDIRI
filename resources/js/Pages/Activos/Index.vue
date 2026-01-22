@@ -93,7 +93,7 @@ const form = useForm({
     estado_id: '',
     fecha_adquisicion: '',
     valor_adquisicion: '',
-    vida_util_anios: '',
+    vida_util_anios: 5,
     valor_residual: '',
     valor_residual_automatico: true,
     numero_serie: '',
@@ -110,7 +110,7 @@ watch(
         }
 
         if (newAuto) {
-            const pct = cat ? (parseFloat(cat.porcentaje_valor_residual) || 0) : 0;
+            const pct = cat ? (parseFloat(cat.porcentaje_valor_residual) || 20) : 20;
             const val = parseFloat(newValor) || 0;
             form.valor_residual = (val * (pct / 100)).toFixed(2);
         }

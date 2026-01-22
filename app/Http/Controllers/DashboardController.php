@@ -48,16 +48,26 @@ class DashboardController extends Controller
                 ];
             });
 
-        // 7. Evolución mensual del valor de adquisición (últimos 12 meses)
-        $evolucionMensual = ActivoFijo::select(
-            DB::raw("DATE_FORMAT(fecha_adquisicion, '%Y-%m') as mes"),
+        // 7. Evolución mensual del valor de adquisición (Últimos 12 meses CALENDARIO)
+        $mesesData = ActivoFijo::select(
+            DB::raw("DATE_FORMAT(fecha_adquisicion, '%Y-%m') as mes_raw"),
             DB::raw('SUM(valor_adquisicion) as total')
         )
-            ->whereNotNull('fecha_adquisicion')
-            ->groupBy('mes')
-            ->orderBy('mes', 'asc')
-            ->take(12)
-            ->get();
+            ->where('fecha_adquisicion', '>=', \Carbon\Carbon::now()->subMonths(11)->startOfMonth())
+            ->groupBy('mes_raw')
+            ->get()
+            ->pluck('total', 'mes_raw');
+
+        $evolucionMensual = collect();
+        for ($i = 11; $i >= 0; $i--) {
+            $fecha = \Carbon\Carbon::now()->subMonths($i);
+            $mesKey = $fecha->format('Y-m');
+
+            $evolucionMensual->push([
+                'mes' => ucfirst($fecha->translatedFormat('M Y')),
+                'total' => $mesesData->get($mesKey, 0)
+            ]);
+        }
 
         // 8. Tabla Reciente: Últimos 10 activos registrados
         $activosRecientes = ActivoFijo::with(['categoria', 'estado'])
