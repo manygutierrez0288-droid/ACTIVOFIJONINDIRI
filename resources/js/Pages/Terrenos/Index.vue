@@ -271,15 +271,15 @@ onMounted(() => {
 
             <div class="relative overflow-hidden shadow-sm rounded-xl border border-gray-100 dark:border-gray-700">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-[10px] text-gray-600 dark:text-gray-300 uppercase bg-gray-50/80 dark:bg-gray-700/80 backdrop-blur-sm border-b dark:border-gray-600">
+                    <thead class="text-xs text-white uppercase bg-gradient-to-r from-blue-600 to-indigo-600">
                         <tr>
-                            <th class="px-3 py-2.5 font-bold">Escritura</th>
+                            <th class="px-3 py-2.5 font-bold rounded-tl-xl">Escritura</th>
                             <th class="px-3 py-2.5 font-bold">Terreno</th>
                             <th class="px-3 py-2.5 font-bold">Dimensiones</th>
                             <th class="px-3 py-2.5 font-bold">Ubicación</th>
                             <th class="px-3 py-2.5 text-right font-bold">Valor/m²</th>
                             <th class="px-3 py-2.5 text-center font-bold">Estado</th>
-                            <th class="px-3 py-2.5 text-center font-bold">Acciones</th>
+                            <th class="px-3 py-2.5 text-center font-bold rounded-tr-xl sticky right-0 z-20 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.2)] bg-indigo-600">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-700">

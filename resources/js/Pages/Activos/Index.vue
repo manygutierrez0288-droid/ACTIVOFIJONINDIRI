@@ -265,49 +265,52 @@ onMounted(() => {
                     
                     <!-- Advanced Filters -->
                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-6">
-                        <div class="flex flex-col lg:flex-row items-center gap-4">
-                            <div class="relative w-full lg:w-96">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                            <!-- Search -->
+                            <div class="lg:col-span-4 relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <SearchIcon class="h-4 w-4 text-gray-400" />
                                 </div>
                                 <input v-model="search" @input="applyFilters" type="text" placeholder="Buscar por código, nombre, serie..." class="block w-full pl-10 pr-3 py-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                                <select v-model="categoriaFilter" @change="applyFilters" class="rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-indigo-500 min-w-[180px]">
+                            <!-- Filters -->
+                            <div class="lg:col-span-5 flex flex-col sm:flex-row gap-3">
+                                <select v-model="categoriaFilter" @change="applyFilters" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-indigo-500">
                                     <option value="">Todas las Categorías</option>
                                     <option v-for="cat in categorias" :key="cat.id" :value="cat.id">{{ cat.nombre }}</option>
                                 </select>
-                                <select v-model="departamentoFilter" @change="applyFilters" class="rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-indigo-500 min-w-[180px]">
+                                <select v-model="departamentoFilter" @change="applyFilters" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-indigo-500">
                                     <option value="">Todos los Departamentos</option>
                                     <option v-for="dep in departamentos" :key="dep.id" :value="dep.id">{{ dep.nombre }}</option>
                                 </select>
                             </div>
                             
-                            <!-- View Toggle -->
-                            <div class="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
-                                <button 
-                                    @click="viewMode = 'table'" 
-                                    :class="[viewMode === 'table' ? 'bg-white dark:bg-gray-700 text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600']"
-                                    class="p-2 rounded-lg transition-all"
-                                    title="Vista de Tabla"
-                                >
-                                    <List class="w-4 h-4" />
-                                </button>
-                                <button 
-                                    @click="viewMode = 'grid'" 
-                                    :class="[viewMode === 'grid' ? 'bg-white dark:bg-gray-700 text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600']"
-                                    class="p-2 rounded-lg transition-all"
-                                    title="Vista de Cuadrícula"
-                                >
-                                    <LayoutGrid class="w-4 h-4" />
-                                </button>
-                            </div>
+                            <!-- Actions -->
+                            <div class="lg:col-span-3 flex items-center justify-end gap-3">
+                                <!-- View Toggle -->
+                                <div class="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 shrink-0">
+                                    <button 
+                                        @click="viewMode = 'table'" 
+                                        :class="[viewMode === 'table' ? 'bg-white dark:bg-gray-700 text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600']"
+                                        class="p-2 rounded-lg transition-all"
+                                        title="Vista de Tabla"
+                                    >
+                                        <List class="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                        @click="viewMode = 'grid'" 
+                                        :class="[viewMode === 'grid' ? 'bg-white dark:bg-gray-700 text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600']"
+                                        class="p-2 rounded-lg transition-all"
+                                        title="Vista de Cuadrícula"
+                                    >
+                                        <LayoutGrid class="w-4 h-4" />
+                                    </button>
+                                </div>
 
-                            <div class="w-full lg:w-auto lg:ml-auto">
-                                <button @click="openCreateModal" class="w-full lg:w-auto flex items-center justify-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 font-bold rounded-lg text-sm px-5 py-2.5 shadow-md transition-all active:scale-95">
+                                <button @click="openCreateModal" class="flex-1 lg:flex-none flex items-center justify-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 font-bold rounded-lg text-sm px-4 py-2.5 shadow-md transition-all active:scale-95 whitespace-nowrap">
                                     <Plus class="w-5 h-5" />
-                                    Registrar Activo
+                                    Registrar
                                 </button>
                             </div>
                         </div>
@@ -356,7 +359,12 @@ onMounted(() => {
                                 <div class="mb-4">
                                     <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-1.5 font-mono">{{ item.codigo_inventario }}</p>
                                     <h3 class="text-lg font-black text-gray-900 dark:text-white leading-tight uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 min-h-[3rem]">{{ item.nombre }}</h3>
-                                    <p class="text-xs font-medium text-gray-400 mt-1 uppercase">{{ item.marca || 'N/A' }} <span v-if="item.modelo"> | {{ item.modelo }}</span></p>
+                                    <p class="text-xs font-medium text-gray-400 mt-1 uppercase">
+    <span v-if="item.marca">{{ item.marca }}</span>
+    <span v-if="item.marca && item.modelo" class="mx-1">|</span>
+    <span v-if="item.modelo">{{ item.modelo }}</span>
+    <span v-if="!item.marca && !item.modelo" class="italic opacity-50 text-[10px]">Sin Marca/Modelo</span>
+</p>
                                 </div>
 
                                 <div class="space-y-3 pt-4 border-t border-gray-50 dark:border-gray-700/50 grow">
@@ -406,18 +414,18 @@ onMounted(() => {
                     </div>
 
                     <!-- Table (Wrapped in Condition) -->
-                    <div v-if="viewMode === 'table'" class="relative overflow-x-auto shadow-md sm:rounded-xl border border-gray-100 dark:border-gray-700">
-                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <div v-if="viewMode === 'table'" class="relative overflow-x-auto shadow-md sm:rounded-xl border border-gray-100 dark:border-gray-700 custom-scrollbar">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 min-w-[1200px]">
+                            <thead class="text-xs text-white uppercase bg-gradient-to-r from-blue-600 to-indigo-600">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3 font-bold">Código</th>
+                                    <th scope="col" class="px-4 py-3 font-bold whitespace-nowrap rounded-tl-xl">Código</th>
                                     <th scope="col" class="px-4 py-3 font-bold text-center">Imagen</th>
-                                    <th scope="col" class="px-4 py-3 font-bold">Activo / Especificaciones</th>
-                                    <th scope="col" class="px-4 py-3 font-bold">Categoría</th>
-                                    <th scope="col" class="px-4 py-3 font-bold">Ubicación / Depto.</th>
-                                    <th scope="col" class="px-4 py-3 text-right font-bold">Valor Neto</th>
-                                    <th scope="col" class="px-4 py-3 text-center font-bold">Estado</th>
-                                    <th scope="col" class="px-4 py-3 text-right font-bold sticky right-0 bg-gray-50 dark:bg-gray-700 z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]">Acciones</th>
+                                    <th scope="col" class="px-4 py-3 font-bold min-w-[250px]">Activo / Especificaciones</th>
+                                    <th scope="col" class="px-4 py-3 font-bold whitespace-nowrap">Categoría</th>
+                                    <th scope="col" class="px-4 py-3 font-bold min-w-[200px]">Ubicación / Depto.</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-bold whitespace-nowrap">Valor Neto</th>
+                                    <th scope="col" class="px-4 py-3 text-center font-bold whitespace-nowrap">Estado</th>
+                                    <th scope="col" class="px-4 py-3 text-center font-bold sticky right-0 z-20 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.2)] rounded-tr-xl bg-indigo-600">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -426,21 +434,26 @@ onMounted(() => {
                                         {{ item.codigo_inventario }}
                                     </td>
                                     <td class="px-4 py-4 text-center">
-                                        <img v-if="item.imagen_url" :src="item.imagen_url" class="w-12 h-12 object-cover rounded-lg shadow-sm mx-auto border border-gray-200 dark:border-gray-600">
-                                        <div v-else class="w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg mx-auto text-gray-400">
-                                            <ImageIcon class="w-6 h-6" />
+                                        <div class="relative group/img">
+                                            <img v-if="item.imagen_url" :src="item.imagen_url" class="w-12 h-12 object-cover rounded-lg shadow-sm mx-auto border border-gray-200 dark:border-gray-600 transition-transform group-hover/img:scale-150 relative z-10 cursor-zoom-in">
+                                            <div v-else class="w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg mx-auto text-gray-400">
+                                                <ImageIcon class="w-6 h-6" />
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="px-4 py-4">
-                                        <div class="font-bold text-gray-900 dark:text-white">{{ item.nombre }}</div>
-                                        <div class="text-[11px] text-gray-400 mt-0.5">
+                                        <div class="font-bold text-gray-900 dark:text-white text-base">{{ item.nombre }}</div>
+                                        <div class="text-[11px] text-gray-400 mt-0.5 flex flex-wrap gap-x-1 items-center">
                                             <span v-if="item.marca">{{ item.marca }}</span>
-                                            <span v-if="item.modelo"> | {{ item.modelo }}</span>
-                                            <span v-if="item.numero_serie"> | S/N: {{ item.numero_serie }}</span>
+                                            <span v-if="item.marca && item.modelo" class="text-gray-300">|</span>
+                                            <span v-if="item.modelo">{{ item.modelo }}</span>
+                                            <span v-if="(item.marca || item.modelo) && item.numero_serie" class="text-gray-300">|</span>
+                                            <span v-if="item.numero_serie">S/N: {{ item.numero_serie }}</span>
+                                            <span v-if="!item.marca && !item.modelo && !item.numero_serie" class="italic opacity-60">Sin especificaciones de fabricante</span>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-4">
-                                        <span class="inline-flex px-2 py-1 text-[11px] font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded border border-gray-200 dark:border-gray-600">
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-600">
                                             {{ item.categoria }}
                                         </span>
                                     </td>
@@ -448,11 +461,11 @@ onMounted(() => {
                                         <div class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{ item.ubicacion }}</div>
                                         <div class="text-[11px] text-gray-500">{{ item.departamento }}</div>
                                     </td>
-                                    <td class="px-4 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                                    <td class="px-4 py-4 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                                         {{ formatCurrency(item.valor_neto) }}
                                     </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase" :class="[
+                                    <td class="px-4 py-4 text-center whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider" :class="[
                                             item.estado_nombre?.toLowerCase().includes('buen') ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
                                             item.estado_nombre?.toLowerCase().includes('regu') ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
                                             'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
@@ -460,21 +473,21 @@ onMounted(() => {
                                             {{ item.estado_nombre }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-4 text-right sticky right-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-700/50 z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)] transition-colors">
+                                    <td class="px-4 py-4 text-right sticky right-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-800 z-20 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]">
                                         <div class="flex items-center justify-end gap-1">
-                                            <a v-if="item.baja_id" :href="route('bajas.acta-baja', item.baja_id)" target="_blank" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-all" title="Ver Acta de Baja">
+                                            <a v-if="item.baja_id" :href="route('bajas.acta-baja', item.baja_id)" target="_blank" class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-all" title="Ver Acta de Baja">
                                                 <FileText class="w-4 h-4" />
                                             </a>
-                                            <Link :href="route('activos.show', item.id)" class="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-lg transition-all" title="Ver Detalles">
+                                            <Link :href="route('activos.show', item.id)" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-lg transition-all" title="Ver Detalles">
                                                 <Eye class="w-4 h-4" />
                                             </Link>
-                                            <Link :href="route('activos.print', item.id)" target="_blank" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 rounded-lg transition-all" title="Ficha Técnica">
+                                            <Link :href="route('activos.print', item.id)" target="_blank" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 rounded-lg transition-all" title="Ficha Técnica">
                                                 <Printer class="w-4 h-4" />
                                             </Link>
-                                            <button @click="openEditModal(item)" class="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-lg transition-all" title="Editar">
+                                            <button @click="openEditModal(item)" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-lg transition-all" title="Editar">
                                                 <Edit3 class="w-4 h-4" />
                                             </button>
-                                            <button @click="confirmDeletion(item.id)" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-all" title="Eliminar">
+                                            <button @click="confirmDeletion(item.id)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-all" title="Eliminar">
                                                 <Trash2 class="w-4 h-4" />
                                             </button>
                                         </div>
@@ -693,7 +706,7 @@ onMounted(() => {
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-2">
-                                        <InputLabel for="marca_id" value="Marca" class="text-[10px] font-bold uppercase text-gray-400" />
+                                        <InputLabel for="marca_id" value="Marca (Opcional)" class="text-[10px] font-bold uppercase text-gray-400" />
                                         <select id="marca_id" v-model="form.marca_id" class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm focus:ring-indigo-500 transition-all">
                                             <option value="">Seleccionar Marca...</option>
                                             <option v-for="marca in marcas" :key="marca.id" :value="marca.id">{{ marca.nombre }}</option>
@@ -702,7 +715,7 @@ onMounted(() => {
                                     </div>
 
                                     <div class="space-y-2">
-                                        <InputLabel for="modelo_id" value="Modelo" class="text-[10px] font-bold uppercase text-gray-400" />
+                                        <InputLabel for="modelo_id" value="Modelo (Opcional)" class="text-[10px] font-bold uppercase text-gray-400" />
                                         <select id="modelo_id" v-model="form.modelo_id" class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm focus:ring-indigo-500 transition-all">
                                             <option value="">Seleccionar Modelo...</option>
                                             <option v-for="mod in modelos" :key="mod.id" :value="mod.id">{{ mod.nombre }}</option>
@@ -711,7 +724,7 @@ onMounted(() => {
                                     </div>
 
                                     <div class="space-y-2">
-                                        <InputLabel for="color_id" value="Color / Acabado" class="text-[10px] font-bold uppercase text-gray-400" />
+                                        <InputLabel for="color_id" value="Color / Acabado (Opcional)" class="text-[10px] font-bold uppercase text-gray-400" />
                                         <select id="color_id" v-model="form.color_id" class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm focus:ring-indigo-500 transition-all">
                                             <option value="">Seleccionar Color...</option>
                                             <option v-for="col in colores" :key="col.id" :value="col.id">{{ col.nombre }}</option>
@@ -720,7 +733,7 @@ onMounted(() => {
                                     </div>
 
                                     <div class="space-y-2">
-                                        <InputLabel for="numero_serie" value="Número de Serie (S/N)" class="text-[10px] font-bold uppercase text-gray-400" />
+                                        <InputLabel for="numero_serie" value="Número de Serie (S/N) (Opcional)" class="text-[10px] font-bold uppercase text-gray-400" />
                                         <TextInput id="numero_serie" type="text" class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm focus:ring-indigo-500 transition-all font-mono" v-model="form.numero_serie" placeholder="Ej: ABC-123-XYZ" />
                                         <InputError :message="form.errors.numero_serie" />
                                     </div>
