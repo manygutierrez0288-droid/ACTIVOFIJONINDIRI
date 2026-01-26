@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -11,8 +11,8 @@ import GlobalSearch from '@/Components/GlobalSearch.vue';
 import NotificationDropdown from '@/Components/NotificationDropdown.vue';
 
 const isSidebarOpen = ref(false);
-const isCatalogosOpen = ref(route().current('departamentos.*') || route().current('ubicaciones.*') || route().current('categorias.*') || route().current('proveedores.*') || route().current('marcas.*') || route().current('modelos.*') || route().current('estados.*') || route().current('colores.*') || route().current('fuentes.*') || route().current('responsables.*') || route().current('cargos.*') || route().current('tecnicos.*'));
-const isActivosOpen = ref(route().current('activos.*') || route().current('vehiculos.*') || route().current('terrenos.*'));
+const isCatalogosOpen = ref(false);
+const isActivosOpen = ref(false);
 const showingNavigationDropdown = ref(false);
 
 const toasts = ref([]);
@@ -21,34 +21,29 @@ let toastIdCounter = 0;
 const addToast = (message, type = 'success') => {
     const id = ++toastIdCounter;
     toasts.value.push({ id, message, type });
-    console.log('Toast added:', { id, message, type });
 };
 
 const removeToast = (id) => {
     toasts.value = toasts.value.filter(t => t.id !== id);
-    console.log('Toast removed:', id);
 };
 
-// Watch flash messages directly
-// Watch flash messages directly
 const page = usePage();
 
+// Manejo de mensajes flash
 watch(() => page.props.flash, (flash) => {
-    // Basic check for existence. You might want to implement a unique ID from backend 
-    // to prevent duplicates, but for now this ensures visibility.
     if (flash?.success) {
         addToast(flash.success, 'success');
-        // Clear flash to prevent reappearance on subsequent potential non-nav updates
-        // Note: Direct prop mutation isn't ideal but works for local state handling or just rely on new navigation clearing it.
     }
     if (flash?.error) {
         addToast(flash.error, 'error');
     }
-}, { deep: true }); // Removed immediate:true to prevent double-toast on mount if not needed, or keep it if navigation preserves component.
+}, { deep: true });
 
-// Just in case, check on mount explicitly
-import { onMounted } from 'vue';
 onMounted(() => {
+    // Inicializar estado de acordeones según la ruta actual
+    isCatalogosOpen.value = route().current('departamentos.*') || route().current('ubicaciones.*') || route().current('categorias.*') || route().current('proveedores.*') || route().current('marcas.*') || route().current('modelos.*') || route().current('estados.*') || route().current('colores.*') || route().current('fuentes.*') || route().current('responsables.*') || route().current('cargos.*') || route().current('tecnicos.*');
+    isActivosOpen.value = route().current('activos.*') || route().current('vehiculos.*') || route().current('terrenos.*');
+
     if (page.props.flash?.success) {
         addToast(page.props.flash.success, 'success');
     }
@@ -68,12 +63,12 @@ const toggleSidebar = () => {
 
 const hasPermission = (permissionNames) => {
     const permissions = Array.isArray(permissionNames) ? permissionNames : [permissionNames];
-    return page.props.auth.user.permissions.some(p => permissions.includes(p));
+    return page.props.auth.user?.permissions?.some(p => permissions.includes(p)) || false;
 };
 
 const hasRole = (roleNames) => {
     const roles = Array.isArray(roleNames) ? roleNames : [roleNames];
-    return page.props.auth.user.roles.some(r => roles.includes(r));
+    return page.props.auth.user?.roles?.some(r => roles.includes(r)) || false;
 };
 
 const isAdmin = computed(() => hasRole(['Administrador', 'admin']));
@@ -228,6 +223,13 @@ const isAdmin = computed(() => hasRole(['Administrador', 'admin']));
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                 </div>
                                 <span class="text-[15px]">Roles</span>
+                            </Link>
+                            
+                            <Link :href="route('backups.index')" :class="[route().current('backups.*') ? 'nav-item-active text-white font-bold' : 'text-indigo-200/70 hover:bg-white/5 hover:text-white']" class="group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300">
+                                <div class="p-2 rounded-xl bg-indigo-800/20 group-hover:bg-indigo-700/30 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                </div>
+                                <span class="text-[15px]">Respaldos</span>
                             </Link>
                         </div>
                     </div>

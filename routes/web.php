@@ -24,6 +24,7 @@ use App\Http\Controllers\BajaController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\BackupController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -126,6 +127,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Respaldos (Solo admin)
+    Route::middleware('role:usuarios')->group(function () {
+        Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
+        Route::post('/backups', [BackupController::class, 'create'])->name('backups.create');
+        Route::get('/backups/download/{filename}', [BackupController::class, 'download'])->name('backups.download');
+        Route::delete('/backups/{filename}', [BackupController::class, 'destroy'])->name('backups.destroy');
+    });
 
     // Configuración
     // Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
