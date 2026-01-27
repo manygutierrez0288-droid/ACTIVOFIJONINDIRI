@@ -23,7 +23,7 @@ class ReporteService
                     return [
                         'Codigo' => $activo->id, // Adjust if you have a specific code field
                         'Nombre' => $activo->nombre,
-                        'Fecha Adquisicion' => $activo->fecha_adquisicion ? $activo->fecha_adquisicion->format('d/m/Y') : 'N/A',
+                        'Fecha Adquisicion' => ($activo->fecha_adquisicion instanceof \Carbon\Carbon) ? $activo->fecha_adquisicion->format('d/m/Y') : (\Carbon\Carbon::parse($activo->fecha_adquisicion)->format('d/m/Y')),
                         'Valor Adquisicion' => number_format((float) $activo->valor_adquisicion, 2),
                         'Valor Residual' => number_format((float) $activo->valor_residual, 2),
                         'Vida Util' => $activo->vida_util_anios,
@@ -53,8 +53,9 @@ class ReporteService
                     ->with(['activoFijo.responsable'])
                     ->get()
                     ->map(function ($mant) {
+                        $fecha = $mant->fecha ? (\Carbon\Carbon::parse($mant->fecha)) : null;
                         return [
-                            'Fecha' => $mant->fecha ? $mant->fecha->format('Y-m-d') : 'N/A',
+                            'Fecha' => $fecha ? $fecha->format('Y-m-d') : 'N/A',
                             'Tipo' => 'MANTENIMIENTO',
                             'Activo' => $mant->activoFijo->nombre ?? 'N/A',
                             'Detalle' => $mant->descripcion ?? 'Mantenimiento realizado',
@@ -104,7 +105,7 @@ class ReporteService
                         'Categoria' => $activo->categoria->nombre ?? 'N/A',
                         'Marca/Modelo' => ($activo->marca->nombre ?? 'N/A') . ' / ' . ($activo->modelo->nombre ?? 'N/A'),
                         'Serie' => $activo->numero_serie,
-                        'Fecha Adquisicion' => $activo->fecha_adquisicion ? $activo->fecha_adquisicion->format('d/m/Y') : 'N/A',
+                        'Fecha Adquisicion' => ($activo->fecha_adquisicion instanceof \Carbon\Carbon) ? $activo->fecha_adquisicion->format('d/m/Y') : (\Carbon\Carbon::parse($activo->fecha_adquisicion)->format('d/m/Y')),
                         'Valor Original' => number_format((float) $activo->valor_adquisicion, 2),
                         'Deprec. Acumulada' => number_format((float) $activo->depreciacion_acumulada_calculada, 2),
                         'Valor Neto' => number_format((float) $activo->valor_neto_calculado, 2),
@@ -159,8 +160,9 @@ class ReporteService
                     ->with(['activoFijo', 'tecnico', 'proveedor', 'estado'])
                     ->get()
                     ->map(function ($mant) {
+                        $fecha = $mant->fecha ? (\Carbon\Carbon::parse($mant->fecha)) : null;
                         return [
-                            'Fecha' => $mant->fecha ? $mant->fecha->format('d/m/Y') : 'N/A',
+                            'Fecha' => $fecha ? $fecha->format('d/m/Y') : 'N/A',
                             'Activo' => $mant->activoFijo->nombre ?? 'N/A',
                             'Codigo' => $mant->activoFijo->codigo_inventario ?? 'N/A',
                             'Descripcion' => $mant->descripcion,
@@ -170,6 +172,17 @@ class ReporteService
                             'Costo' => number_format((float) $mant->costo, 2),
                         ];
                     });
+
+            case 'usuarios':
+                return \App\Models\User::with('roles')->get()->map(function ($user) {
+                    return [
+                        'Nombre' => $user->name,
+                        'Correo Electrónico' => $user->email,
+                        'Roles' => $user->roles->pluck('name')->implode(', ') ?: 'Sin Rol',
+                        'Estado' => $user->email_verified_at ? 'Verificado' : 'Pendiente',
+                        'Fecha Registro' => $user->created_at->format('d/m/Y'),
+                    ];
+                });
 
         }
     }
