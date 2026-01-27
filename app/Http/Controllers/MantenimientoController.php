@@ -47,4 +47,12 @@ class MantenimientoController extends Controller
 
         return redirect()->route('activos.show', $request->activo_fijo_id)->with('success', 'Mantenimiento registrado correctamente.');
     }
+
+    public function print(Mantenimiento $mantenimiento)
+    {
+        $mantenimiento->load(['activoFijo.categoria', 'tecnico', 'proveedor', 'estado']);
+        return Inertia::render('Operaciones/Mantenimientos/Ficha', [
+            'mantenimiento' => $mantenimiento,
+        ]);
+    }
 }

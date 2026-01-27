@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/movimientos/{movimiento}/rechazar', [MovimientoController::class, 'rechazar'])->name('movimientos.rechazar');
         Route::get('/activos/{activo}/mantenimientos/create', [MantenimientoController::class, 'create'])->name('mantenimientos.create');
         Route::post('/mantenimientos', [MantenimientoController::class, 'store'])->name('mantenimientos.store');
+        Route::get('/mantenimientos/{mantenimiento}/print', [MantenimientoController::class, 'print'])->name('mantenimientos.print');
         Route::get('/activos/{activo}/bajas/create', [BajaController::class, 'create'])->name('bajas.create');
         Route::post('/bajas', [BajaController::class, 'store'])->name('bajas.store');
 

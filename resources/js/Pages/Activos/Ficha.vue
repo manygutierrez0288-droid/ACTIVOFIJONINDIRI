@@ -1,10 +1,12 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { onMounted, computed } from 'vue';
 
 const props = defineProps({
     activo: Object,
 });
+
+const page = usePage();
 
 onMounted(() => {
     // Automatically open print dialog when loaded
@@ -21,9 +23,9 @@ const formatCurrency = (value) => {
 };
 
 const qrCodeUrl = computed(() => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const origin = page.props.app_url || (typeof window !== 'undefined' ? window.location.origin : '');
     const id = props.activo?.id ?? '';
-    return `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(origin + '/activos/' + id)}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(origin + '/activos/' + id)}`;
 });
 </script>
 

@@ -1,16 +1,23 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
-import { onMounted } from 'vue';
+import { Head, usePage } from '@inertiajs/vue3';
+import { onMounted, computed } from 'vue';
 
 const props = defineProps({
     activo: Object,
     fecha_emision: String,
 });
 
+const page = usePage();
+
 onMounted(() => {
     setTimeout(() => {
         window.print();
     }, 500);
+});
+
+const qrCodeUrl = computed(() => {
+    const origin = page.props.app_url || (typeof window !== 'undefined' ? window.location.origin : '');
+    return `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(origin + '/activos/' + props.activo.id)}`;
 });
 </script>
 
@@ -126,7 +133,7 @@ onMounted(() => {
                 <p>Generado por SIAFNIN - Nicaragua</p>
             </div>
             <div class="flex flex-col items-center">
-                <img :src="`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(route('activos.show', activo.id))}`" alt="QR Code" class="w-16 h-16 opacity-50 mb-1" />
+                <img :src="qrCodeUrl" alt="QR Code" class="w-16 h-16 opacity-50 mb-1" />
                 <p class="font-mono">VALIDACIÓN DIGITAL</p>
             </div>
         </div>

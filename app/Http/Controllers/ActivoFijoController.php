@@ -151,9 +151,16 @@ class ActivoFijoController extends Controller
                 ];
             });
 
+        // Get maintenance history
+        $mantenimientos = \App\Models\Mantenimiento::where('activo_fijo_id', $id)
+            ->with(['tecnico', 'proveedor', 'estado'])
+            ->orderBy('fecha', 'desc')
+            ->get();
+
         return Inertia::render('Activos/Show', [
             'activo' => (new ActivoFijoResource($activo))->resolve(),
-            'auditorias' => $auditorias
+            'auditorias' => $auditorias,
+            'mantenimientos' => $mantenimientos
         ]);
     }
 

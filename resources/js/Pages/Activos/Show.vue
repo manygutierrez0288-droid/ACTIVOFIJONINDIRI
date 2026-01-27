@@ -11,6 +11,7 @@ import {
 const props = defineProps({
     activo: Object,
     auditorias: Array,
+    mantenimientos: Array,
 });
 
 const formatCurrency = (value) => {
@@ -197,8 +198,48 @@ const formatCurrency = (value) => {
                             </div>
                         </div>
 
+                        <!-- Maintenance History Section -->
+                        <div v-if="mantenimientos && mantenimientos.length > 0" class="mt-10">
+                            <div class="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <span class="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+                                    <Wrench class="w-5 h-5 text-emerald-600" />
+                                </span>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Historial de Mantenimientos</h3>
+                            </div>
+
+                            <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="bg-gray-50 dark:bg-gray-900/50">
+                                            <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha</th>
+                                            <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Descripción</th>
+                                            <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Técnico / Proveedor</th>
+                                            <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Costo</th>
+                                            <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                                        <tr v-for="mant in mantenimientos" :key="mant.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                            <td class="px-4 py-4 text-xs font-bold text-gray-900 dark:text-gray-100 italic">{{ new Date(mant.fecha).toLocaleDateString() }}</td>
+                                            <td class="px-4 py-4 text-xs text-gray-600 dark:text-gray-400 max-w-xs truncate">{{ mant.descripcion }}</td>
+                                            <td class="px-4 py-4 text-xs text-gray-600 dark:text-gray-400">
+                                                <div class="font-bold text-gray-800 dark:text-gray-200 uppercase">{{ mant.tecnico?.nombre || '-' }}</div>
+                                                <div class="text-[10px] opacity-70">{{ mant.proveedor?.nombre || 'Taller Interno' }}</div>
+                                            </td>
+                                            <td class="px-4 py-4 text-xs font-bold text-right text-gray-900 dark:text-white">{{ formatCurrency(mant.costo) }}</td>
+                                            <td class="px-4 py-4 text-center">
+                                                <a :href="route('mantenimientos.print', { mantenimiento: mant.id })" target="_blank" class="inline-flex items-center p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors" title="Imprimir Ficha">
+                                                    <Printer class="w-4 h-4" />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                         <!-- Audit History Section -->
-                        <hr class="border-gray-200 dark:border-gray-700 my-6">
+                        <hr class="border-gray-200 dark:border-gray-700 my-10">
                         <AuditHistory :auditorias="auditorias" />
                     </div>
                 </div>

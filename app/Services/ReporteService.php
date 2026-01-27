@@ -153,6 +153,24 @@ class ReporteService
                     ];
                 });
 
+            case 'mantenimientos':
+                $assetIds = $query->pluck('id');
+                return Mantenimiento::whereIn('activo_fijo_id', $assetIds)
+                    ->with(['activoFijo', 'tecnico', 'proveedor', 'estado'])
+                    ->get()
+                    ->map(function ($mant) {
+                        return [
+                            'Fecha' => $mant->fecha ? $mant->fecha->format('d/m/Y') : 'N/A',
+                            'Activo' => $mant->activoFijo->nombre ?? 'N/A',
+                            'Codigo' => $mant->activoFijo->codigo_inventario ?? 'N/A',
+                            'Descripcion' => $mant->descripcion,
+                            'Tecnico' => $mant->tecnico->nombre ?? 'N/A',
+                            'Proveedor' => $mant->proveedor->nombre ?? 'N/A',
+                            'Estado' => $mant->estado->nombre ?? 'N/A',
+                            'Costo' => number_format((float) $mant->costo, 2),
+                        ];
+                    });
+
         }
     }
 
