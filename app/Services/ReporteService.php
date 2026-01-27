@@ -179,7 +179,7 @@ class ReporteService
                         'Nombre' => $user->name,
                         'Correo Electrónico' => $user->email,
                         'Roles' => $user->roles->pluck('name')->implode(', ') ?: 'Sin Rol',
-                        'Estado' => $user->email_verified_at ? 'Verificado' : 'Pendiente',
+                        'Estado' => $user->activo ? 'ACTIVO' : 'INACTIVO',
                         'Fecha Registro' => $user->created_at->format('d/m/Y'),
                     ];
                 });

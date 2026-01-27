@@ -40,6 +40,7 @@ const form = useForm({
     email: '',
     password: '',
     roles: [],
+    activo: true,
 });
 
 // Open/Close logic
@@ -57,6 +58,7 @@ const openEditModal = (user) => {
     form.email = user.email;
     form.password = '';
     form.roles = user.roles?.map(r => r.id) || [];
+    form.activo = user.activo ?? true;
     showModal.value = true;
 };
 
@@ -124,6 +126,12 @@ const deleteUser = () => {
                             </div>
                         </div>
                         <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="flex items-center mr-2">
+                                <span :class="user.activo ? 'bg-emerald-500' : 'bg-gray-400'" class="w-2 h-2 rounded-full animate-pulse mr-1"></span>
+                                <span class="text-[8px] font-black uppercase" :class="user.activo ? 'text-emerald-500' : 'text-gray-400'">
+                                    {{ user.activo ? 'En Línea' : 'Inactivo' }}
+                                </span>
+                            </div>
                             <button @click="openEditModal(user)" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all" title="Editar"><Settings class="w-4 h-4" /></button>
                             <button @click="openDeleteModal(user.id)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all" title="Eliminar"><UserMinus class="w-4 h-4" /></button>
                         </div>
@@ -212,6 +220,23 @@ const deleteUser = () => {
                             </label>
                         </div>
                         <InputError :message="form.errors.roles" />
+                    </div>
+
+                    <div class="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div :class="form.activo ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-400'" class="p-2 rounded-lg transition-colors">
+                                <CheckCircle2 v-if="form.activo" class="w-5 h-5" />
+                                <X v-else class="w-5 h-5" />
+                            </div>
+                            <div>
+                                <p class="text-xs font-black uppercase text-gray-900 dark:text-white">Estado de la cuenta</p>
+                                <p class="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{{ form.activo ? 'El usuario puede acceder al sistema' : 'El acceso está restringido' }}</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" v-model="form.activo" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                        </label>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-6">

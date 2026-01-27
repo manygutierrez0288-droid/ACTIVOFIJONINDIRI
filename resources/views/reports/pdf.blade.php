@@ -130,6 +130,54 @@
         </tr>
     </table>
 
+    @if(str_contains(strtolower($title), 'usuarios'))
+        @php
+            $activeCount = 0;
+            $inactiveCount = 0;
+            $rolesList = [];
+            foreach ($data as $row) {
+                // Estado is at index 3 in the ReporteService map for users (Nombre, Correo, Roles, Estado, Fecha)
+                $estado = (array_values((array) $row))[3] ?? '';
+                if ($estado === 'ACTIVO')
+                    $activeCount++;
+                else if ($estado === 'INACTIVO')
+                    $inactiveCount++;
+
+                $roles = (array_values((array) $row))[2] ?? '';
+                if ($roles !== 'Sin Rol') {
+                    foreach (explode(', ', $roles) as $r) {
+                        if ($r)
+                            $rolesList[] = $r;
+                    }
+                }
+            }
+            $rolesCount = count(array_unique($rolesList));
+        @endphp
+
+        <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 25%; padding: 10px; border: 2px solid #1e3a8a; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase;">Total
+                        Usuarios</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #1e3a8a;">{{ count($data) }}</div>
+                </td>
+                <td style="width: 25%; padding: 10px; border: 2px solid #059669; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 8px; font-weight: bold; color: #059669; text-transform: uppercase;">Activos</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #059669;">{{ $activeCount }}</div>
+                </td>
+                <td style="width: 25%; padding: 10px; border: 2px solid #dc2626; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 8px; font-weight: bold; color: #dc2626; text-transform: uppercase;">Inactivos
+                    </div>
+                    <div style="font-size: 16px; font-weight: 900; color: #dc2626;">{{ $inactiveCount }}</div>
+                </td>
+                <td style="width: 25%; padding: 10px; border: 2px solid #d97706; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 8px; font-weight: bold; color: #d97706; text-transform: uppercase;">Roles</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #d97706;">{{ $rolesCount }}</div>
+                </td>
+            </tr>
+        </table>
+    @endif
+
     <table class="data-table">
         <thead>
             <tr>

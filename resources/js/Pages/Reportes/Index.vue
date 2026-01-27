@@ -165,6 +165,16 @@ const columnTotals = computed(() => {
     });
     return totals;
 });
+
+const userSummary = computed(() => {
+    if (reportType.value !== 'usuarios' || reportData.value.length === 0) return null;
+    
+    const active = reportData.value.filter(u => u.Estado === 'ACTIVO').length;
+    const inactive = reportData.value.filter(u => u.Estado === 'INACTIVO').length;
+    const roles = new Set(reportData.value.flatMap(u => u.Roles.split(', ').filter(r => r !== 'Sin Rol'))).size;
+    
+    return { active, inactive, roles, total: reportData.value.length };
+});
 </script>
 
 <template>
@@ -334,6 +344,26 @@ const columnTotals = computed(() => {
 
                                 <!-- Table -->
                                 <div v-else class="p-6">
+                                    <!-- User Stats Summary -->
+                                    <div v-if="userSummary" class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div class="p-4 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-800">
+                                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Total Usuarios</p>
+                                            <p class="text-2xl font-black text-indigo-700 dark:text-indigo-400">{{ userSummary.total }}</p>
+                                        </div>
+                                        <div class="p-4 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800">
+                                            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Activos</p>
+                                            <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400">{{ userSummary.active }}</p>
+                                        </div>
+                                        <div class="p-4 bg-rose-50/50 dark:bg-rose-900/20 rounded-2xl border border-rose-100 dark:border-rose-800">
+                                            <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Inactivos</p>
+                                            <p class="text-2xl font-black text-rose-600 dark:text-rose-400">{{ userSummary.inactive }}</p>
+                                        </div>
+                                        <div class="p-4 bg-amber-50/50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800">
+                                            <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">Roles en Uso</p>
+                                            <p class="text-2xl font-black text-amber-600 dark:text-amber-400">{{ userSummary.roles }}</p>
+                                        </div>
+                                    </div>
+
                                     <table class="w-full text-left border-separate border-spacing-0">
                                         <thead>
                                             <tr>
@@ -387,6 +417,26 @@ const columnTotals = computed(() => {
                     <span>Emitido el: {{ new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</span>
                     <span>Documento No: <span class="font-mono text-sm border-b-2 border-indigo-900 text-indigo-900 px-2">{{ documentNumber }}</span></span>
                     <span>Usuario: {{ $page.props.auth.user.name }}</span>
+                </div>
+
+                <!-- Print Version User Summary -->
+                <div v-if="userSummary" class="grid grid-cols-4 gap-4 mb-8">
+                    <div class="border-2 border-indigo-900 p-4 rounded-xl text-center">
+                        <p class="text-[8px] font-black uppercase text-gray-500">Total Usuarios</p>
+                        <p class="text-xl font-black text-indigo-900">{{ userSummary.total }}</p>
+                    </div>
+                    <div class="border-2 border-indigo-900 p-4 rounded-xl text-center">
+                        <p class="text-[8px] font-black uppercase text-gray-500">Activos</p>
+                        <p class="text-xl font-black text-indigo-900">{{ userSummary.active }}</p>
+                    </div>
+                    <div class="border-2 border-indigo-900 p-4 rounded-xl text-center">
+                        <p class="text-[8px] font-black uppercase text-gray-500">Inactivos</p>
+                        <p class="text-xl font-black text-indigo-900">{{ userSummary.inactive }}</p>
+                    </div>
+                    <div class="border-2 border-indigo-900 p-4 rounded-xl text-center">
+                        <p class="text-[8px] font-black uppercase text-gray-500">Roles</p>
+                        <p class="text-xl font-black text-indigo-900">{{ userSummary.roles }}</p>
+                    </div>
                 </div>
 
                 <table class="w-full border-collapse border border-gray-200 text-[8pt]">

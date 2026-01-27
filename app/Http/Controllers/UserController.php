@@ -44,7 +44,8 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'roles' => 'array|exists:roles,id'
+            'roles' => 'array|exists:roles,id',
+            'activo' => 'boolean'
         ]);
 
         $this->userService->create($request->all());
@@ -70,7 +71,8 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|min:8',
-            'roles' => 'array|exists:roles,id'
+            'roles' => 'array|exists:roles,id',
+            'activo' => 'boolean'
         ]);
 
         $this->userService->update($id, $request->all());
