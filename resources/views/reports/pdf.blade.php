@@ -151,15 +151,28 @@
             <tr class="totals-row">
                 @php
                     $totals = [];
+                    $numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto', 'Costo', 'Valor Original'];
+
                     foreach ($headers as $index => $header) {
                         $sum = 0;
                         $isNumeric = true;
+
+                        // Solo procesar si el encabezado está en la lista blanca
+                        if (!in_array($header, $numericColumns)) {
+                            $totals[$index] = '';
+                            continue;
+                        }
+
                         foreach ($data as $row) {
                             $value = array_values((array) $row)[$index] ?? 0;
-                            $cleanValue = preg_replace('/[^0-9.-]/', '', $value);
+                            // Limpiar el valor: quitar símbolos de moneda, comas de miles, etc.
+                            $cleanValue = preg_replace('/[^0-9.-]/', '', (string) $value);
+
                             if (is_numeric($cleanValue) && $cleanValue !== '') {
                                 $sum += floatval($cleanValue);
                             } else if ($value !== '' && $value !== null) {
+                                // Si encontramos un valor no numérico en una columna que debería serlo, 
+                                // detenemos la suma para esa columna
                                 $isNumeric = false;
                                 break;
                             }

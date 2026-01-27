@@ -144,7 +144,7 @@ const columnTotals = computed(() => {
     if (reportData.value.length === 0 || columns.value.length === 0) return {};
     
     // Define columns that should be totaled (whitelisted)
-    const numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto'];
+    const numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto', 'Costo', 'Valor Original'];
 
     const totals = {};
     columns.value.forEach(col => {
