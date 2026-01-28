@@ -22,7 +22,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->userService->getAll();
+        $users = \App\Models\User::with('roles')->get();
         $roles = $this->roleService->getAll();
         return Inertia::render('Users/Index', [
             'users' => UserResource::collection($users),

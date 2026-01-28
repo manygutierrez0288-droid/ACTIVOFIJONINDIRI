@@ -115,25 +115,27 @@ const deleteUser = () => {
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div v-for="user in (users?.data || users || [])" :key="user.id" class="relative group bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center border border-indigo-100 dark:border-indigo-800">
+                    <div class="flex items-start justify-between mb-4 border-b border-gray-50 dark:border-gray-800 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center border border-indigo-100 dark:border-indigo-800 flex-shrink-0">
                                 <UserCircle class="w-7 h-7 text-indigo-500" />
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white leading-tight">{{ user.name }}</h4>
-                                <p class="text-[10px] text-gray-500 font-medium truncate w-32 md:w-40">{{ user.email }}</p>
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-gray-900 dark:text-white leading-tight truncate">{{ user.name }}</h4>
+                                <p class="text-[10px] text-gray-500 font-medium truncate">{{ user.email }}</p>
                             </div>
                         </div>
-                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div class="flex items-center mr-2">
-                                <span :class="user.activo ? 'bg-emerald-500' : 'bg-gray-400'" class="w-2 h-2 rounded-full animate-pulse mr-1"></span>
-                                <span class="text-[8px] font-black uppercase" :class="user.activo ? 'text-emerald-500' : 'text-gray-400'">
-                                    {{ user.activo ? 'En Línea' : 'Inactivo' }}
+                        <div class="flex flex-col items-end gap-2 flex-shrink-0 ml-2">
+                             <div class="flex items-center px-2 py-0.5 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
+                                <span :class="user.activo ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-gray-400'" class="w-1.5 h-1.5 rounded-full mr-1.5"></span>
+                                <span class="text-[8px] font-black uppercase tracking-wider" :class="user.activo ? 'text-emerald-600' : 'text-gray-500'">
+                                    {{ user.activo ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </div>
-                            <button @click="openEditModal(user)" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all" title="Editar"><Settings class="w-4 h-4" /></button>
-                            <button @click="openDeleteModal(user.id)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all" title="Eliminar"><UserMinus class="w-4 h-4" /></button>
+                            <div class="flex gap-1">
+                                <button @click="openEditModal(user)" class="p-1.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 rounded-lg transition-all border border-indigo-100 dark:border-indigo-800" title="Editar"><Settings class="w-4 h-4" /></button>
+                                <button @click="openDeleteModal(user.id)" class="p-1.5 bg-red-50 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-100 rounded-lg transition-all border border-red-100 dark:border-red-800" title="Eliminar"><UserMinus class="w-4 h-4" /></button>
+                            </div>
                         </div>
                     </div>
 

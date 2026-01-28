@@ -33,6 +33,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Ruta pública para escaneo de QR
+Route::get('/consultar-activo/{id}', [App\Http\Controllers\PublicQRController::class, 'show'])->name('public.activo.show');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 

@@ -25,7 +25,7 @@ const formatCurrency = (value) => {
 const qrCodeUrl = computed(() => {
     const origin = page.props.app_url || (typeof window !== 'undefined' ? window.location.origin : '');
     const id = props.activo?.id ?? '';
-    return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(origin + '/activos/' + id)}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(origin + '/consultar-activo/' + id)}`;
 });
 </script>
 
