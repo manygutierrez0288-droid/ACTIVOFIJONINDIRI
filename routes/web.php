@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/activos/{activo}', [ActivoFijoController::class, 'update'])->name('activos.update.post');
         Route::get('/activos/{activo}/historial', [App\Http\Controllers\AuditoriaController::class, 'show'])->name('activos.historial');
         Route::get('/activos/{activoFijo}/print', [ActivoFijoController::class, 'print'])->name('activos.print');
+        Route::get('/activos/{activoFijo}/label', [ActivoFijoController::class, 'label'])->name('activos.label');
 
         // Operaciones de activos
         Route::get('/activos/{activo}/movimientos/create', [MovimientoController::class, 'create'])->name('movimientos.create');

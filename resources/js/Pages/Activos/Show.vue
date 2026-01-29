@@ -37,37 +37,52 @@ const formatCurrency = (value) => {
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <!-- Botones de Acción Superiores -->
-                        <div class="flex flex-wrap items-center justify-between gap-3 mb-8 pb-6 border-b border-gray-100 dark:border-gray-700">
-                            <div class="flex items-center gap-2">
-                                <Link :href="route('activos.index')" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-black hover:bg-gray-200 dark:hover:bg-gray-600 transition-all border border-gray-200 dark:border-gray-600">
-                                    <ArrowLeft class="w-4 h-4 mr-2" /> VOLVER
+                        <div class="flex flex-col gap-6 mb-10 pb-8 border-b border-gray-100 dark:border-gray-700">
+                            <!-- Fila 1: Navegación e Impresión -->
+                            <div class="flex flex-wrap items-center justify-between gap-4">
+                                <Link :href="route('activos.index')" class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700 hover:border-gray-300 shadow-sm">
+                                    <ArrowLeft class="w-4 h-4 mr-2" /> VOLVER AL LISTADO
                                 </Link>
-                                <a :href="route('activos.print', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-indigo-100 dark:shadow-none">
-                                    <Printer class="w-4 h-4 mr-2" /> IMPRIMIR FICHA
-                                </a>
+
+                                <div class="flex items-center gap-2">
+                                    <a :href="route('activos.print', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-indigo-200 dark:shadow-none hover:-translate-y-0.5 active:translate-y-0">
+                                        <Printer class="w-4 h-4 mr-2" /> FICHA TÉCNICA
+                                    </a>
+                                    <a :href="route('activos.label', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-emerald-200 dark:shadow-none hover:-translate-y-0.5 active:translate-y-0">
+                                        <Tag class="w-4 h-4 mr-2" /> ETIQUETA QR
+                                    </a>
+                                </div>
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-2">
-                                <Link :href="route('activos.index', { edit_id: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <Pencil class="w-3.5 h-3.5 mr-1.5" /> Editar
+                            <!-- Fila 2: Gestión y Operaciones -->
+                            <div class="flex flex-wrap items-center gap-3 bg-gray-50/50 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-800">
+                                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-2 mr-1">Gestión:</span>
+                                
+                                <Link :href="route('activos.index', { edit_id: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-500 rounded-xl text-xs font-bold transition-all border border-amber-100 dark:border-amber-900/30 hover:bg-amber-50 shadow-sm">
+                                    <Pencil class="w-3.5 h-3.5 mr-2" /> Editar Datos
                                 </Link>
-                                <Link :href="route('activos.historial', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <History class="w-3.5 h-3.5 mr-1.5" /> Historial
+                                
+                                <Link :href="route('activos.historial', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-500 rounded-xl text-xs font-bold transition-all border border-purple-100 dark:border-purple-900/30 hover:bg-purple-50 shadow-sm">
+                                    <History class="w-3.5 h-3.5 mr-2" /> Auditoría
                                 </Link>
-                                <div class="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <Link :href="route('movimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all text-nowrap">
-                                    <Move class="w-3.5 h-3.5 mr-1.5" /> Traslado
+
+                                <div class="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+
+                                <Link :href="route('movimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                                    <Move class="w-3.5 h-3.5 mr-2" /> Trasladar
                                 </Link>
-                                <Link :href="route('mantenimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all text-nowrap">
-                                    <Wrench class="w-3.5 h-3.5 mr-1.5" /> Mantenimiento
+                                
+                                <Link :href="route('mantenimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                                    <Wrench class="w-3.5 h-3.5 mr-2" /> Mantenimiento
                                 </Link>
+
                                 <template v-if="activo.estado_id === 6 && activo.baja_id">
-                                    <a :href="route('bajas.acta-baja', { baja: activo.baja_id })" target="_blank" class="inline-flex items-center px-3 py-2 bg-red-700 hover:bg-black text-white rounded-xl text-xs font-bold transition-all text-nowrap shadow-sm animate-pulse">
-                                        <FileText class="w-3.5 h-3.5 mr-1.5" /> ACTA DE BAJA
+                                    <a :href="route('bajas.acta-baja', { baja: activo.baja_id })" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-700 hover:bg-black text-white rounded-xl text-xs font-bold transition-all shadow-sm animate-pulse">
+                                        <FileText class="w-3.5 h-3.5 mr-2" /> ACTA DE BAJA
                                     </a>
                                 </template>
-                                <Link v-else :href="route('bajas.create', { activo: props.activo.id })" class="inline-flex items-center px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all text-nowrap">
-                                    <Trash2 class="w-3.5 h-3.5 mr-1.5" /> Baja
+                                <Link v-else :href="route('bajas.create', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 rounded-xl text-xs font-bold transition-all shadow-sm">
+                                    <Trash2 class="w-3.5 h-3.5 mr-2" /> Solicitar Baja
                                 </Link>
                             </div>
                         </div>

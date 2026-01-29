@@ -219,6 +219,14 @@ class ActivoFijoController extends Controller
         ]);
     }
 
+    public function label(ActivoFijo $activoFijo)
+    {
+        $activoFijo->load(['categoria', 'departamento', 'ubicacion', 'marca', 'modelo', 'color', 'responsable', 'estado']);
+        return Inertia::render('Activos/Etiqueta', [
+            'activo' => (new ActivoFijoResource($activoFijo))->resolve(),
+        ]);
+    }
+
     public function actaAsignacion(ActivoFijo $activo)
     {
         $activo->load(['categoria', 'departamento', 'ubicacion', 'marca', 'modelo', 'responsable.cargo']);
