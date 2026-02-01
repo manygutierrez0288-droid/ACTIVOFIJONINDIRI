@@ -57,20 +57,20 @@ const formatCurrency = (value) => {
                         <!-- Botones de Acción Superiores -->
                         <div class="flex flex-wrap items-center justify-between gap-3 mb-8 pb-6 border-b border-gray-100 dark:border-gray-700">
                             <div class="flex items-center gap-2">
-                                <Link :href="route('vehiculos.index')" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-black hover:bg-gray-200 dark:hover:bg-gray-600 transition-all border border-gray-200 dark:border-gray-600">
-                                    <ArrowLeft class="w-4 h-4 mr-2" /> VOLVER
+                                <Link :href="route('vehiculos.index')" class="inline-flex items-center justify-center px-6 h-11 bg-white dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl text-xs font-black transition-all border border-gray-200 dark:border-gray-700 hover:border-gray-400 min-w-[180px]">
+                                    <ArrowLeft class="w-4 h-4 mr-2" /> VOLVER AL LISTADO
                                 </Link>
-                                <a :href="route('vehiculos.print', props.vehiculo.id)" target="_blank" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-indigo-100 dark:shadow-none">
-                                    <Printer class="w-4 h-4 mr-2" /> IMPRIMIR FICHA
+                                <a :href="route('vehiculos.print', props.vehiculo.id)" target="_blank" class="inline-flex items-center justify-center px-6 h-11 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                    <Printer class="w-4 h-4 mr-2" /> FICHA TÉCNICA
                                 </a>
                             </div>
 
                             <div class="flex flex-wrap items-center gap-2">
-                                <Link :href="route('vehiculos.index', { edit_id: props.vehiculo.id })" class="inline-flex items-center px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <Pencil class="w-3.5 h-3.5 mr-1.5" /> Editar
+                                <Link :href="route('vehiculos.index', { edit_id: props.vehiculo.id })" class="inline-flex items-center justify-center px-6 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                    <Pencil class="w-4 h-4 mr-1.5" /> EDITAR
                                 </Link>
-                                <Link :href="route('activos.historial', { activo: props.vehiculo.activo_fijo_id })" class="inline-flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <History class="w-3.5 h-3.5 mr-1.5" /> Historial
+                                <Link :href="route('activos.historial', { activo: props.vehiculo.activo_fijo_id })" class="inline-flex items-center justify-center px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                    <History class="w-4 h-4 mr-1.5" /> HISTORIAL
                                 </Link>
                             </div>
                         </div>

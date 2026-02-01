@@ -199,7 +199,7 @@
             <tr class="totals-row">
                 @php
                     $totals = [];
-                    $numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto', 'Costo', 'Valor Original'];
+                    $numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto', 'Costo', 'Valor Original', 'Valor Catastral', 'Valor Libros'];
 
                     foreach ($headers as $index => $header) {
                         $sum = 0;

@@ -69,8 +69,8 @@ class TerrenoController extends Controller
             // Datos del activo fijo
             'nombre' => 'required|string|max:255',
             'categoria_id' => 'required|exists:categorias,id',
-            'departamento_id' => 'required|exists:departamentos,id',
-            'ubicacion_id' => 'required|exists:ubicacions,id',
+            'departamento_id' => 'nullable|exists:departamentos,id',
+            'ubicacion_id' => 'nullable|exists:ubicacions,id',
             'marca_id' => 'nullable|exists:marcas,id',
             'modelo_id' => 'nullable|exists:modelos,id',
             'color_id' => 'nullable|exists:colors,id',
@@ -99,6 +99,7 @@ class TerrenoController extends Controller
             'uso_suelo' => 'nullable|string|max:100',
             'zonificacion' => 'nullable|string|max:100',
             'valor_catastral' => 'nullable|numeric|min:0',
+            'dominio' => 'required|string|max:100',
         ]);
 
         $data = $validated;
@@ -146,8 +147,8 @@ class TerrenoController extends Controller
             // Datos del activo fijo
             'nombre' => 'required|string|max:255',
             'categoria_id' => 'required|exists:categorias,id',
-            'departamento_id' => 'required|exists:departamentos,id',
-            'ubicacion_id' => 'required|exists:ubicacions,id',
+            'departamento_id' => 'nullable|exists:departamentos,id',
+            'ubicacion_id' => 'nullable|exists:ubicacions,id',
             'marca_id' => 'nullable|exists:marcas,id',
             'modelo_id' => 'nullable|exists:modelos,id',
             'color_id' => 'nullable|exists:colors,id',
@@ -176,6 +177,7 @@ class TerrenoController extends Controller
             'uso_suelo' => 'nullable|string|max:100',
             'zonificacion' => 'nullable|string|max:100',
             'valor_catastral' => 'nullable|numeric|min:0',
+            'dominio' => 'required|string|max:100',
         ]);
 
         $data = $validated;

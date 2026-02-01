@@ -34,20 +34,19 @@ const formatDate = (date) => {
     <Head :title="`Terreno ${terreno.numero_escritura}`" />
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <Link :href="route('terrenos.index')" class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
-                        <ChevronLeft class="w-5 h-5 text-gray-500" />
-                    </Link>
-                    <div>
-                        <h2 class="font-bold text-2xl text-gray-900 dark:text-white">{{ terreno.activo_fijo?.nombre }}</h2>
-                        <p class="text-sm text-gray-500">Escritura: {{ terreno.numero_escritura }}</p>
-                    </div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-black text-2xl text-gray-900 dark:text-white uppercase tracking-tight">{{ terreno.activo_fijo?.nombre }}</h2>
+                    <p class="text-sm text-indigo-600 dark:text-indigo-400 font-bold mt-1 uppercase tracking-wider">Escritura: {{ terreno.numero_escritura }}</p>
                 </div>
-                <Link :href="route('terrenos.edit', terreno.id)" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all">
-                    <Edit class="w-4 h-4" />
-                    Editar
-                </Link>
+                <div class="flex items-center gap-3">
+                    <Link :href="route('terrenos.index')" class="inline-flex items-center justify-center px-6 h-11 bg-white dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl text-xs font-black transition-all border border-gray-200 dark:border-gray-700 hover:border-gray-400 min-w-[180px]">
+                        <ChevronLeft class="w-4 h-4 mr-2" /> VOLVER AL LISTADO
+                    </Link>
+                    <Link :href="route('terrenos.edit', terreno.id)" class="inline-flex items-center justify-center px-6 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                        <Edit class="w-4 h-4 mr-2" /> EDITAR DATOS
+                    </Link>
+                </div>
             </div>
         </template>
 
@@ -58,6 +57,10 @@ const formatDate = (date) => {
                     <h3 class="font-bold text-lg text-gray-900 dark:text-white">Información del Terreno</h3>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <p class="text-xs font-bold uppercase text-gray-500 mb-1">Propiedad / Dominio</p>
+                        <p class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ terreno.dominio || 'No especificado' }}</p>
+                    </div>
                     <div>
                         <p class="text-xs font-bold uppercase text-gray-500 mb-1">Número de Escritura</p>
                         <p class="text-lg font-bold text-indigo-600 dark:text-indigo-400 font-mono">{{ terreno.numero_escritura }}</p>

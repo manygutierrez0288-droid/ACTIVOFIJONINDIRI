@@ -12,6 +12,7 @@ class TerrenoResource extends JsonResource
         return [
             'id' => $this->id,
             'activo_fijo_id' => $this->activo_fijo_id,
+            'dominio' => $this->dominio,
             'numero_escritura' => $this->numero_escritura,
             'area_metros_cuadrados' => $this->area_metros_cuadrados,
             'frente_metros' => $this->frente_metros,

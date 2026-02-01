@@ -9,6 +9,7 @@ import TextInput from '@/Components/TextInput.vue';
 import { 
     FileSpreadsheet, 
     FileText, 
+    FilePlus,
     Printer, 
     BarChart3, 
     ClipboardList, 
@@ -28,7 +29,8 @@ import {
     CheckCircle2,
     ShieldCheck,
     Wrench,
-    Users
+    Users,
+    Map
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -42,9 +44,11 @@ const viewMode = ref('menu'); // 'menu' | 'report'
 const selectedReport = ref(null);
 
 const reportOptions = [
+    { id: 'altas', label: 'Altas de Activos', desc: 'Reporte detallado de nuevos ingresos al patrimonio, proveedores y fuentes de financiamiento.', icon: FilePlus, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
     { id: 'inventario', label: 'Inventario General', desc: 'Listado completo y detallado de todos los activos fijos registrados.', icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
     { id: 'depreciacion', label: 'Cálculo Depreciación', desc: 'Análisis del valor actual, desgaste acumulado y proyección contable.', icon: BarChart3, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
     { id: 'categoria', label: 'Por Categoría', desc: 'Clasificación organizada de bienes según su naturaleza técnica.', icon: Layers, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+    { id: 'por_responsable', label: 'Por Responsable', desc: 'Listado de activos agrupados por responsable, mostrando cantidad y valor total asignado.', icon: Users, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-900/20' },
     { id: 'acciones', label: 'Movimientos y Gestiones', desc: 'Auditoría completa de movimientos, cambios y gestiones realizadas.', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
     { id: 'mantenimientos', label: 'Mantenimientos', desc: 'Reporte detallado de mantenimientos preventivos y correctivos realizados.', icon: Wrench, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
     { id: 'usuarios', label: 'Usuarios y Roles', desc: 'Control de accesos, roles asignados y estado de usuarios del sistema.', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
@@ -52,6 +56,7 @@ const reportOptions = [
     { id: 'libro_activos', label: 'Libro de Activos', desc: 'Registro pormenorizado para cumplimiento de normativas externas.', icon: BookOpen, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
     { id: 'resumen_mensual', label: 'Resumen Mensual', desc: 'Consolidado de altas y bajas durante el ciclo de operación actual.', icon: CalendarDays, color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
     { id: 'vehiculos', label: 'Flota Vehicular', desc: 'Detalle técnico y operativo de todos los vehículos asignados.', icon: Printer, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
+    { id: 'terrenos', label: 'Catastro de Terrenos', desc: 'Listado legal de propiedades, áreas, escrituras y titularidad municipal.', icon: Map, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
 ];
 
 const selectReport = (report) => {
@@ -79,6 +84,7 @@ const filters = ref({
     categoria_id: '',
     departamento_id: '',
     ubicacion_id: '',
+    dominio: '',
 });
 
 const columns = ref([]);
@@ -144,7 +150,7 @@ const columnTotals = computed(() => {
     if (reportData.value.length === 0 || columns.value.length === 0) return {};
     
     // Define columns that should be totaled (whitelisted)
-    const numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto', 'Costo', 'Valor Original'];
+    const numericColumns = ['Valor', 'Valor Adquisicion', 'Valor Residual', 'Depreciacion Acumulada', 'Valor Neto', 'Total Valor', 'Deprec. Mes', 'Deprec. Acum.', 'Valor Bruto', 'Costo', 'Valor Original', 'Valor Catastral', 'Valor Libros', 'Cantidad Activos'];
 
     const totals = {};
     columns.value.forEach(col => {
@@ -282,6 +288,16 @@ const userSummary = computed(() => {
                                     </select>
                                 </div>
 
+                                <div v-if="reportType === 'terrenos'" class="space-y-2">
+                                    <InputLabel value="Propiedad / Dominio" class="text-[10px] font-bold uppercase text-gray-400" />
+                                    <select v-model="filters.dominio" class="w-full border-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs font-bold p-3">
+                                        <option value="">Todos los dominios</option>
+                                        <option value="Alcaldía Municipal">Alcaldía Municipal</option>
+                                        <option value="Gobierno Central">Gobierno Central</option>
+                                        <option value="Otros">Otros</option>
+                                    </select>
+                                </div>
+
                                 <div class="space-y-3">
                                     <InputLabel value="Rango Temporal" class="text-[10px] font-bold uppercase text-gray-400" />
                                     <div class="relative">
@@ -367,7 +383,7 @@ const userSummary = computed(() => {
                                     <table class="w-full text-left border-separate border-spacing-0">
                                         <thead>
                                             <tr>
-                                                <th v-for="col in columns" :key="col" class="px-4 py-4 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-50 dark:border-gray-700 whitespace-nowrap">
+                                                <th v-for="col in columns" :key="col" class="px-5 py-5 text-[12px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.1em] border-b-2 border-blue-50 dark:border-blue-900/30 whitespace-nowrap bg-blue-50/30 dark:bg-blue-900/10">
                                                     {{ col.replace(/_/g, ' ') }}
                                                 </th>
                                             </tr>

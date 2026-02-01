@@ -139,6 +139,21 @@ class ReporteService
                         'Valor' => number_format((float) $activo->valor_adquisicion, 2),
                     ];
                 });
+
+            case 'altas':
+                return $query->with(['proveedor', 'fuente'])->get()->map(function ($activo) {
+                    return [
+                        'Codigo' => $activo->codigo_inventario,
+                        'Nombre' => $activo->nombre,
+                        'Fecha Alta' => ($activo->fecha_adquisicion instanceof \Carbon\Carbon) ? $activo->fecha_adquisicion->format('d/m/Y') : (\Carbon\Carbon::parse($activo->fecha_adquisicion)->format('d/m/Y')),
+                        'Proveedor' => $activo->proveedor->nombre ?? 'N/A',
+                        'Fuente Fondos' => $activo->fuente->nombre ?? 'N/A',
+                        'Costo' => number_format((float) $activo->valor_adquisicion, 2),
+                        'Responsable' => $activo->responsable->nombre ?? 'N/A',
+                        'Ubicacion' => $activo->ubicacion->nombre ?? 'N/A',
+                    ];
+                });
+
             case 'vehiculos':
                 return $query->has('vehiculo')->with('vehiculo')->get()->map(function ($activo) {
                     return [
@@ -184,6 +199,33 @@ class ReporteService
                     ];
                 });
 
+            case 'terrenos':
+                return $query->has('terreno')->with('terreno')->get()->map(function ($activo) {
+                    return [
+                        'Codigo' => $activo->codigo_inventario,
+                        'Nombre' => $activo->nombre,
+                        'Escritura' => $activo->terreno->numero_escritura ?? 'N/A',
+                        'Area' => number_format($activo->terreno->area_metros_cuadrados ?? 0, 2) . ' m²',
+                        'Dominio' => $activo->terreno->dominio ?? 'N/A',
+                        'Uso Suelo' => $activo->terreno->uso_suelo ?? 'N/A',
+                        'Valor Catastral' => number_format((float) ($activo->terreno->valor_catastral ?? 0), 2),
+                        'Valor Libros' => number_format((float) $activo->valor_adquisicion, 2),
+                        'Departamento' => $activo->departamento->nombre ?? 'N/A',
+                    ];
+                });
+
+            case 'por_responsable':
+                return $query->get()->groupBy('responsable.nombre')->map(function ($items, $responsable) {
+                    return [
+                        'Responsable' => $responsable ?: 'Sin Asignar',
+                        'Cantidad Activos' => $items->count(),
+                        'Valor Total' => number_format($items->sum('valor_adquisicion'), 2),
+                        'Valor Neto' => number_format($items->sum('valor_neto_calculado'), 2),
+                        'Departamento' => $items->first()->departamento->nombre ?? 'N/A',
+                        'Cargo' => $items->first()->responsable->cargo->nombre ?? 'N/A',
+                    ];
+                })->values();
+
         }
     }
 
@@ -197,6 +239,11 @@ class ReporteService
         }
         if (!empty($filters['ubicacion_id'])) {
             $query->where('ubicacion_id', $filters['ubicacion_id']);
+        }
+        if (!empty($filters['dominio'])) {
+            $query->whereHas('terreno', function ($q) use ($filters) {
+                $q->where('dominio', $filters['dominio']);
+            });
         }
         if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
             $query->whereBetween('fecha_adquisicion', [$filters['fecha_inicio'], $filters['fecha_fin']]);

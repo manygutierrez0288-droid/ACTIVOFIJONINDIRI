@@ -37,53 +37,60 @@ const formatCurrency = (value) => {
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <!-- Botones de Acción Superiores -->
-                        <div class="flex flex-col gap-6 mb-10 pb-8 border-b border-gray-100 dark:border-gray-700">
+                        <div class="flex flex-col gap-8 mb-10 pb-8 border-b border-gray-100 dark:border-gray-700">
                             <!-- Fila 1: Navegación e Impresión -->
                             <div class="flex flex-wrap items-center justify-between gap-4">
-                                <Link :href="route('activos.index')" class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-xl text-xs font-bold transition-all border border-gray-200 dark:border-gray-700 hover:border-gray-300 shadow-sm">
+                                <Link :href="route('activos.index')" class="inline-flex items-center justify-center px-6 h-11 bg-white dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl text-xs font-black transition-all border border-gray-200 dark:border-gray-700 hover:border-gray-400 hover:shadow-md min-w-[180px]">
                                     <ArrowLeft class="w-4 h-4 mr-2" /> VOLVER AL LISTADO
                                 </Link>
 
-                                <div class="flex items-center gap-2">
-                                    <a :href="route('activos.print', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-indigo-200 dark:shadow-none hover:-translate-y-0.5 active:translate-y-0">
+                                <div class="flex items-center gap-3">
+                                    <a :href="route('activos.print', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center justify-center px-6 h-11 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-indigo-100 dark:shadow-none hover:-translate-y-0.5 active:translate-y-0 min-w-[160px]">
                                         <Printer class="w-4 h-4 mr-2" /> FICHA TÉCNICA
                                     </a>
-                                    <a :href="route('activos.label', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-emerald-200 dark:shadow-none hover:-translate-y-0.5 active:translate-y-0">
+                                    <a :href="route('activos.label', { activoFijo: props.activo.id })" target="_blank" class="inline-flex items-center justify-center px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-emerald-100 dark:shadow-none hover:-translate-y-0.5 active:translate-y-0 min-w-[160px]">
                                         <Tag class="w-4 h-4 mr-2" /> ETIQUETA QR
                                     </a>
                                 </div>
                             </div>
 
                             <!-- Fila 2: Gestión y Operaciones -->
-                            <div class="flex flex-wrap items-center gap-3 bg-gray-50/50 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-800">
-                                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-2 mr-1">Gestión:</span>
-                                
-                                <Link :href="route('activos.index', { edit_id: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-500 rounded-xl text-xs font-bold transition-all border border-amber-100 dark:border-amber-900/30 hover:bg-amber-50 shadow-sm">
-                                    <Pencil class="w-3.5 h-3.5 mr-2" /> Editar Datos
-                                </Link>
-                                
-                                <Link :href="route('activos.historial', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-500 rounded-xl text-xs font-bold transition-all border border-purple-100 dark:border-purple-900/30 hover:bg-purple-50 shadow-sm">
-                                    <History class="w-3.5 h-3.5 mr-2" /> Auditoría
-                                </Link>
+                            <div class="bg-gray-50/50 dark:bg-gray-900/30 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <div class="flex items-center gap-2 mr-4 border-r border-gray-200 dark:border-gray-700 pr-4">
+                                        <div class="p-2 bg-gray-200/50 dark:bg-gray-800 rounded-lg">
+                                            <Info class="w-4 h-4 text-gray-400" />
+                                        </div>
+                                        <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Acciones de Gestión</span>
+                                    </div>
+                                    
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <Link :href="route('activos.index', { edit_id: props.activo.id })" class="inline-flex items-center justify-center px-6 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                            <Pencil class="w-4 h-4 mr-2" /> EDITAR DATOS
+                                        </Link>
+                                        
+                                        <Link :href="route('activos.historial', { activo: props.activo.id })" class="inline-flex items-center justify-center px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                            <History class="w-4 h-4 mr-2" /> AUDITORÍA
+                                        </Link>
 
-                                <div class="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+                                        <Link :href="route('movimientos.create', { activo: props.activo.id })" class="inline-flex items-center justify-center px-6 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                            <Move class="w-4 h-4 mr-2" /> TRASLADAR
+                                        </Link>
+                                        
+                                        <Link :href="route('mantenimientos.create', { activo: props.activo.id })" class="inline-flex items-center justify-center px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                            <Wrench class="w-4 h-4 mr-2" /> MANTENIMIENTO
+                                        </Link>
 
-                                <Link :href="route('movimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <Move class="w-3.5 h-3.5 mr-2" /> Trasladar
-                                </Link>
-                                
-                                <Link :href="route('mantenimientos.create', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <Wrench class="w-3.5 h-3.5 mr-2" /> Mantenimiento
-                                </Link>
-
-                                <template v-if="activo.estado_id === 6 && activo.baja_id">
-                                    <a :href="route('bajas.acta-baja', { baja: activo.baja_id })" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-700 hover:bg-black text-white rounded-xl text-xs font-bold transition-all shadow-sm animate-pulse">
-                                        <FileText class="w-3.5 h-3.5 mr-2" /> ACTA DE BAJA
-                                    </a>
-                                </template>
-                                <Link v-else :href="route('bajas.create', { activo: props.activo.id })" class="inline-flex items-center px-4 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 rounded-xl text-xs font-bold transition-all shadow-sm">
-                                    <Trash2 class="w-3.5 h-3.5 mr-2" /> Solicitar Baja
-                                </Link>
+                                        <template v-if="activo.estado_id === 6 && activo.baja_id">
+                                            <a :href="route('bajas.acta-baja', { baja: activo.baja_id })" target="_blank" class="inline-flex items-center justify-center px-6 h-11 bg-red-700 hover:bg-black text-white rounded-xl text-xs font-black transition-all min-w-[160px]">
+                                                <Printer class="w-4 h-4 mr-2" /> ACTA DE BAJA
+                                            </a>
+                                        </template>
+                                        <Link v-else :href="route('bajas.create', { activo: props.activo.id })" class="inline-flex items-center justify-center px-6 h-11 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black transition-all shadow-sm min-w-[160px]">
+                                            <Trash2 class="w-4 h-4 mr-2" /> SOLICITAR BAJA
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         

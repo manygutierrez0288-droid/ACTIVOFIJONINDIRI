@@ -56,7 +56,7 @@ const currentImage = ref(null);
 
 // Form
 const form = useForm({
-    nombre: '',
+    dominio: '',
     numero_escritura: '',
     area_metros_cuadrados: 0,
     frente_metros: 0,
@@ -124,6 +124,7 @@ const openEditModal = (item) => {
     // Map data to form
     const af = item.activo_fijo;
     form.nombre = af.nombre;
+    form.dominio = item.dominio || '';
     form.numero_escritura = item.numero_escritura;
     form.area_metros_cuadrados = item.area_metros_cuadrados;
     form.frente_metros = item.frente_metros;
@@ -299,7 +300,10 @@ onMounted(() => {
                                     </div>
                                     <div>
                                         <span class="font-bold text-gray-900 dark:text-white block">{{ terreno.activo_fijo?.nombre }}</span>
-                                        <span class="text-[10px] text-gray-500 uppercase font-medium">{{ terreno.uso_suelo || 'S/U' }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] text-gray-500 uppercase font-medium">{{ terreno.uso_suelo || 'S/U' }}</span>
+                                            <span v-if="terreno.dominio" class="text-[9px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-md font-bold uppercase">{{ terreno.dominio }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -561,6 +565,17 @@ onMounted(() => {
                                             :error="form.errors.responsable_id"
                                         />
                                         <InputError :message="form.errors.responsable_id" />
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <InputLabel value="Propiedad / Dominio" class="text-xs font-bold uppercase text-gray-400" />
+                                        <select v-model="form.dominio" class="w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-xl focus:ring-indigo-500">
+                                            <option value="">Seleccionar Titularidad...</option>
+                                            <option value="Alcaldía Municipal">Alcaldía Municipal</option>
+                                            <option value="Gobierno Central">Gobierno Central</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                        <InputError :message="form.errors.dominio" />
                                     </div>
                                 </div>
                             </div>
