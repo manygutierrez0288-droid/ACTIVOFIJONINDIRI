@@ -1,0 +1,145 @@
+// SIAFNIN - Módulo de Transacciones de Activos
+// Diagrama 4 de 6
+
+Project SIAFNIN_Transactions {
+  database_type: 'MySQL'
+  Note: 'Transacciones de Activos - SIAFNIN'
+}
+
+// ============================================
+// TABLAS DE REFERENCIA (Simplificadas)
+// ============================================
+
+Table activo_fijos {
+  id bigint [pk]
+  codigo_inventario varchar(20)
+  nombre varchar(255)
+  Note: 'Referencia a activos fijos'
+}
+
+Table users {
+  id bigint [pk]
+  name varchar(255)
+  Note: 'Referencia a usuarios'
+}
+
+Table ubicacions {
+  id bigint [pk]
+  nombre varchar(255)
+  Note: 'Referencia a ubicaciones'
+}
+
+Table personal_responsables {
+  id bigint [pk]
+  nombre varchar(150)
+  Note: 'Referencia a responsables'
+}
+
+Table estado_activos {
+  id bigint [pk]
+  nombre varchar(50)
+  Note: 'Referencia a estados'
+}
+
+Table tecnicos {
+  id bigint [pk]
+  nombre varchar(150)
+  Note: 'Referencia a técnicos'
+}
+
+Table proveedors {
+  id bigint [pk]
+  nombre varchar(100)
+  Note: 'Referencia a proveedores'
+}
+
+// ============================================
+// MANTENIMIENTOS
+// ============================================
+
+Table mantenimientos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  fecha date [not null]
+  descripcion text [not null]
+  costo decimal(12,2) [null]
+  tecnico_id bigint [null, ref: > tecnicos.id]
+  proveedor_id bigint [null, ref: > proveedors.id]
+  estado_id bigint [not null, ref: > estado_activos.id]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Registros de mantenimiento de activos'
+}
+
+// ============================================
+// MOVIMIENTOS
+// ============================================
+
+Table movimientos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  ubicacion_origen_id bigint [not null, ref: > ubicacions.id]
+  ubicacion_destino_id bigint [not null, ref: > ubicacions.id]
+  responsable_origen_id bigint [not null, ref: > personal_responsables.id]
+  responsable_destino_id bigint [not null, ref: > personal_responsables.id]
+  fecha datetime [default: `CURRENT_TIMESTAMP`]
+  motivo text [not null]
+  status varchar(50) [null, note: 'pendiente, aprobado, rechazado']
+  motivo_rechazo text [null]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Movimientos/traslados de activos entre ubicaciones y responsables'
+}
+
+// ============================================
+// BAJAS DE ACTIVOS
+// ============================================
+
+Table baja_activos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  fecha date [not null]
+  motivo text [not null]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Registros de retiro/disposición de activos'
+}
+
+// ============================================
+// CAMBIOS DE ESTADO
+// ============================================
+
+Table cambio_estados {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  estado_anterior_id bigint [not null, ref: > estado_activos.id]
+  estado_nuevo_id bigint [not null, ref: > estado_activos.id]
+  fecha datetime [default: `CURRENT_TIMESTAMP`]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Historial de cambios de estado de activos'
+}
+
+// ============================================
+// AUDITORÍA
+// ============================================
+
+Table auditoria_activos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  usuario_id bigint [not null, ref: > users.id]
+  accion varchar(255) [not null, note: 'created, updated, deleted']
+  valores_anteriores text [null, note: 'JSON']
+  valores_nuevos text [null, note: 'JSON']
+  fecha_hora datetime [not null]
+  
+  Note: 'Pista de auditoría completa para todos los cambios de activos'
+}

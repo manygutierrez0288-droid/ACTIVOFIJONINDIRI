@@ -11,9 +11,9 @@ class ActivoFijoRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function getAllWithRelations()
+    public function getAllWithRelations($filters = [])
     {
-        return $this->model->with([
+        $query = $this->model->with([
             'categoria',
             'departamento',
             'ubicacion',
@@ -25,7 +25,34 @@ class ActivoFijoRepository extends BaseRepository
             'responsable',
             'estado',
             'bajas'
-        ])->get();
+        ]);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                    ->orWhere('codigo_inventario', 'like', "%{$search}%")
+                    ->orWhere('numero_serie', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['categoria'])) {
+            $query->where('categoria_id', $filters['categoria']);
+        }
+
+        if (!empty($filters['departamento'])) {
+            $query->where('departamento_id', $filters['departamento']);
+        }
+
+        if (!empty($filters['ubicacion'])) {
+            $query->where('ubicacion_id', $filters['ubicacion']);
+        }
+
+        if (!empty($filters['estado'])) {
+            $query->where('estado_id', $filters['estado']);
+        }
+
+        return $query->get();
     }
 
     public function getByIdWithRelations($id)

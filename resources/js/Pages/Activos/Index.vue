@@ -56,6 +56,7 @@ const props = defineProps({
 const search = ref(props.filters?.search || '');
 const categoriaFilter = ref(props.filters?.categoria || '');
 const departamentoFilter = ref(props.filters?.departamento || '');
+const estadoFilter = ref(props.filters?.estado || '');
 const viewMode = ref(localStorage.getItem('siafnin_activos_view') || 'table');
 
 watch(viewMode, (newMode) => {
@@ -67,6 +68,7 @@ const applyFilters = () => {
         search: search.value,
         categoria: categoriaFilter.value,
         departamento: departamentoFilter.value,
+        estado: estadoFilter.value,
     }, { preserveState: true, replace: true });
 };
 
@@ -283,6 +285,10 @@ onMounted(() => {
                                 <select v-model="departamentoFilter" @change="applyFilters" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-indigo-500">
                                     <option value="">Todos los Departamentos</option>
                                     <option v-for="dep in departamentos" :key="dep.id" :value="dep.id">{{ dep.nombre }}</option>
+                                </select>
+                                <select v-model="estadoFilter" @change="applyFilters" class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-indigo-500">
+                                    <option value="">Todos los Estados</option>
+                                    <option v-for="est in estados" :key="est.id" :value="est.id">{{ est.nombre }}</option>
                                 </select>
                             </div>
                             

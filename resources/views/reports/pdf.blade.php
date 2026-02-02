@@ -125,7 +125,7 @@
 
     <table class="meta-table">
         <tr>
-            <td style="text-align: left;">EMITIDO EL: {{ date('d/m/Y H:i') }}</td>
+            <td style="text-align: left;">EMITIDO EL: {{ date('d/m/Y h:i A') }}</td>
             <td style="text-align: right;">USUARIO: {{ auth()->user()->name ?? 'SISTEMA' }}</td>
         </tr>
     </table>

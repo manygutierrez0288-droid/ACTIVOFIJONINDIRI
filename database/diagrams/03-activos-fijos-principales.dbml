@@ -1,0 +1,154 @@
+// SIAFNIN - Módulo de Activos Fijos Principales
+// Diagrama 3 de 6
+
+Project SIAFNIN_Assets {
+  database_type: 'MySQL'
+  Note: 'Activos Fijos Principales - SIAFNIN'
+}
+
+// ============================================
+// TABLAS DE REFERENCIA (Simplificadas)
+// ============================================
+
+Table users {
+  id bigint [pk]
+  name varchar(255)
+  Note: 'Referencia a usuarios'
+}
+
+Table categorias {
+  id bigint [pk]
+  nombre varchar(255)
+  Note: 'Referencia a categorías'
+}
+
+Table departamentos {
+  id bigint [pk]
+  nombre varchar(255)
+  Note: 'Referencia a departamentos'
+}
+
+Table ubicacions {
+  id bigint [pk]
+  nombre varchar(255)
+  Note: 'Referencia a ubicaciones'
+}
+
+Table marcas {
+  id bigint [pk]
+  nombre varchar(100)
+  Note: 'Referencia a marcas'
+}
+
+Table modelos {
+  id bigint [pk]
+  nombre varchar(100)
+  marca_id bigint [ref: > marcas.id]
+  Note: 'Referencia a modelos'
+}
+
+Table colors {
+  id bigint [pk]
+  nombre varchar(50)
+  Note: 'Referencia a colores'
+}
+
+Table fuentes {
+  id bigint [pk]
+  nombre varchar(100)
+  Note: 'Referencia a fuentes'
+}
+
+Table proveedors {
+  id bigint [pk]
+  nombre varchar(100)
+  Note: 'Referencia a proveedores'
+}
+
+Table personal_responsables {
+  id bigint [pk]
+  nombre varchar(150)
+  Note: 'Referencia a responsables'
+}
+
+Table estado_activos {
+  id bigint [pk]
+  nombre varchar(50)
+  Note: 'Referencia a estados'
+}
+
+// ============================================
+// ACTIVO FIJO PRINCIPAL
+// ============================================
+
+Table activo_fijos {
+  id bigint [pk, increment]
+  codigo_inventario varchar(20) [unique, null, note: 'Formato: CAT-YYYY-NNNN']
+  nombre varchar(255) [not null]
+  marca_id bigint [null, ref: > marcas.id]
+  modelo_id bigint [null, ref: > modelos.id]
+  color_id bigint [null, ref: > colors.id]
+  categoria_id bigint [null, ref: > categorias.id]
+  departamento_id bigint [null, ref: > departamentos.id]
+  ubicacion_id bigint [null, ref: > ubicacions.id]
+  fuente_id bigint [null, ref: > fuentes.id]
+  proveedor_id bigint [null, ref: > proveedors.id]
+  responsable_id bigint [null, ref: > personal_responsables.id]
+  estado_id bigint [null, ref: > estado_activos.id]
+  fecha_adquisicion date [null]
+  valor_adquisicion decimal(12,2) [null]
+  vida_util_anios integer [null]
+  imagen_url varchar(255) [null]
+  valor_residual decimal(12,2) [null]
+  valor_residual_automatico boolean [default: true]
+  depreciacion_acumulada decimal(12,2) [default: 0]
+  user_creacion_id bigint [null, ref: > users.id]
+  user_modificacion_id bigint [null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Tabla principal de activos fijos - entidad central del sistema'
+}
+
+// ============================================
+// EXTENSIONES DE ACTIVOS FIJOS
+// ============================================
+
+Table vehiculos {
+  id bigint [pk, increment]
+  placa varchar(20) [unique, not null]
+  numero_motor varchar(50) [null]
+  chasis varchar(50) [unique, null]
+  numero_circulacion varchar(50) [null]
+  anio integer [null]
+  kilometraje decimal(10,2) [null]
+  capacidad_pasajeros integer [null]
+  tipo_combustible varchar(50) [null]
+  activo_fijo_id bigint [unique, not null, ref: - activo_fijos.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Detalles específicos de vehículos (extiende activo_fijos)'
+}
+
+Table terrenos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [unique, not null, ref: - activo_fijos.id]
+  dominio varchar(255) [null, note: 'Alcaldía Municipal o Gobierno Central']
+  numero_escritura varchar(100) [unique, not null]
+  area_metros_cuadrados decimal(12,2) [not null]
+  frente_metros decimal(10,2) [null]
+  fondo_metros decimal(10,2) [null]
+  lindero_norte text [null]
+  lindero_sur text [null]
+  lindero_este text [null]
+  lindero_oeste text [null]
+  coordenadas_gps varchar(255) [null]
+  uso_suelo varchar(255) [null]
+  zonificacion varchar(255) [null]
+  valor_catastral decimal(12,2) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Detalles específicos de terrenos (extiende activo_fijos)'
+}

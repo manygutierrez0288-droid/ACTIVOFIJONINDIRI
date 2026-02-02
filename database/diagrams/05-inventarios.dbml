@@ -1,0 +1,63 @@
+// SIAFNIN - Módulo de Inventarios
+// Diagrama 5 de 6
+
+Project SIAFNIN_Inventory {
+  database_type: 'MySQL'
+  Note: 'Gestión de Inventarios - SIAFNIN'
+}
+
+// ============================================
+// TABLAS DE REFERENCIA (Simplificadas)
+// ============================================
+
+Table users {
+  id bigint [pk]
+  name varchar(255)
+  Note: 'Referencia a usuarios'
+}
+
+Table activo_fijos {
+  id bigint [pk]
+  codigo_inventario varchar(20)
+  nombre varchar(255)
+  Note: 'Referencia a activos fijos'
+}
+
+Table estado_activos {
+  id bigint [pk]
+  nombre varchar(50)
+  Note: 'Referencia a estados de activos'
+}
+
+// ============================================
+// INVENTARIOS FÍSICOS
+// ============================================
+
+Table inventarios {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null, note: 'ej: "Inventario Anual 2025"']
+  fecha_inicio date [not null]
+  fecha_fin date [null]
+  estado enum('abierto', 'cerrado') [default: 'abierto']
+  user_id bigint [not null, ref: > users.id]
+  observaciones text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Procesos de inventario físico'
+}
+
+Table inventario_detalles {
+  id bigint [pk, increment]
+  inventario_id bigint [not null, ref: > inventarios.id]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  verificado boolean [default: false]
+  fecha_verificacion timestamp [null]
+  estado_fisico_id bigint [null, ref: > estado_activos.id]
+  comentarios text [null]
+  verificado_por bigint [null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Registros individuales de verificación de activos dentro de un inventario'
+}

@@ -30,7 +30,8 @@ import {
     ShieldCheck,
     Wrench,
     Users,
-    Map
+    Map,
+    Trash2
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -57,6 +58,7 @@ const reportOptions = [
     { id: 'resumen_mensual', label: 'Resumen Mensual', desc: 'Consolidado de altas y bajas durante el ciclo de operación actual.', icon: CalendarDays, color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
     { id: 'vehiculos', label: 'Flota Vehicular', desc: 'Detalle técnico y operativo de todos los vehículos asignados.', icon: Printer, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
     { id: 'terrenos', label: 'Catastro de Terrenos', desc: 'Listado legal de propiedades, áreas, escrituras y titularidad municipal.', icon: Map, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+    { id: 'bajas', label: 'Bajas de Activos', desc: 'Detalle de activos desincorporados, incluyendo motivo, acta y fecha de baja.', icon: Trash2, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
 ];
 
 const selectReport = (report) => {
@@ -243,7 +245,7 @@ const userSummary = computed(() => {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest rounded-full">Módulo Activo</span>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ new Date().toLocaleString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) }}</span>
                             </div>
                             <h3 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">{{ selectedReport.label }}</h3>
                         </div>
@@ -430,7 +432,7 @@ const userSummary = computed(() => {
                 </div>
 
                 <div class="meta-section w-full mb-8 flex justify-between items-center text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-100 pb-4">
-                    <span>Emitido el: {{ new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</span>
+                    <span>Emitido el: {{ new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) }}</span>
                     <span>Documento No: <span class="font-mono text-sm border-b-2 border-indigo-900 text-indigo-900 px-2">{{ documentNumber }}</span></span>
                     <span>Usuario: {{ $page.props.auth.user.name }}</span>
                 </div>

@@ -1,0 +1,531 @@
+// SIAFNIN - Sistema Integral de Administración de Activos Fijos de Nicaragua
+// Database Schema Definition Language (DBML)
+// Generated: 2026-02-01
+
+Project SIAFNIN {
+  database_type: 'MySQL'
+  Note: 'Sistema Integral de Administración de Activos Fijos'
+}
+
+// ============================================
+// AUTHENTICATION & AUTHORIZATION TABLES
+// ============================================
+
+Table users {
+  id bigint [pk, increment]
+  name varchar(255) [not null]
+  email varchar(255) [unique, not null]
+  email_verified_at timestamp [null]
+  password varchar(255) [not null]
+  remember_token varchar(100) [null]
+  activo boolean [default: true, note: 'User active status']
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'System users with authentication credentials'
+}
+
+Table roles {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description varchar(255) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'User roles (Admin, Reporteria, etc.)'
+}
+
+Table usuario_rol {
+  user_id bigint [not null, ref: > users.id]
+  role_id bigint [not null, ref: > roles.id]
+  
+  indexes {
+    (user_id, role_id) [pk]
+  }
+  
+  Note: 'Many-to-many relationship between users and roles'
+}
+
+Table permissions {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description varchar(255) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'System permissions for granular access control'
+}
+
+Table role_permission {
+  id bigint [pk, increment]
+  role_id bigint [not null, ref: > roles.id]
+  permission_id bigint [not null, ref: > permissions.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  indexes {
+    (role_id, permission_id) [unique]
+  }
+  
+  Note: 'Permissions assigned to roles'
+}
+
+Table password_reset_tokens {
+  email varchar(255) [pk]
+  token varchar(255) [not null]
+  created_at timestamp [null]
+  
+  Note: 'Password reset tokens'
+}
+
+Table sessions {
+  id varchar(255) [pk]
+  user_id bigint [null, ref: > users.id]
+  ip_address varchar(45) [null]
+  user_agent text [null]
+  payload longtext [not null]
+  last_activity integer [not null]
+  
+  indexes {
+    user_id
+    last_activity
+  }
+  
+  Note: 'User session management'
+}
+
+// ============================================
+// CATALOG TABLES (Master Data)
+// ============================================
+
+Table categorias {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null]
+  codigo varchar(5) [null]
+  porcentaje_valor_residual decimal(5,2) [default: 10.00, note: 'Default residual value percentage']
+  descripcion varchar(255) [null]
+  vida_util_anios integer [default: 5, note: 'Default useful life in years']
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset categories (Furniture, Equipment, Vehicles, etc.)'
+}
+
+Table departamentos {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null]
+  descripcion varchar(255) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Organizational departments'
+}
+
+Table ubicacions {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null]
+  descripcion varchar(255) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Physical locations for assets'
+}
+
+Table marcas {
+  id bigint [pk, increment]
+  nombre varchar(100) [unique, not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset brands/manufacturers'
+}
+
+Table modelos {
+  id bigint [pk, increment]
+  nombre varchar(100) [not null]
+  marca_id bigint [not null, ref: > marcas.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset models associated with brands'
+}
+
+Table colors {
+  id bigint [pk, increment]
+  nombre varchar(50) [unique, not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Available colors for assets'
+}
+
+Table fuentes {
+  id bigint [pk, increment]
+  nombre varchar(100) [unique, not null]
+  descripcion varchar(255) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Funding sources for asset acquisition'
+}
+
+Table proveedors {
+  id bigint [pk, increment]
+  nombre varchar(100) [not null]
+  numero_ruc varchar(20) [unique, null]
+  telefono varchar(20) [null]
+  email varchar(100) [null]
+  direccion text [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Suppliers/vendors'
+}
+
+Table cargos {
+  id bigint [pk, increment]
+  nombre varchar(100) [unique, not null]
+  descripcion text [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Job positions/titles'
+}
+
+Table personal_responsables {
+  id bigint [pk, increment]
+  nombre varchar(150) [not null]
+  cargo_id bigint [not null, ref: > cargos.id]
+  numero_cedula varchar(20) [unique, not null]
+  telefono varchar(30) [null]
+  email varchar(100) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Personnel responsible for assets'
+}
+
+Table tecnicos {
+  id bigint [pk, increment]
+  nombre varchar(150) [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Maintenance technicians'
+}
+
+Table estado_activos {
+  id bigint [pk, increment]
+  nombre varchar(50) [unique, not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset status (Active, In Maintenance, Retired, etc.)'
+}
+
+// ============================================
+// CORE ASSET TABLES
+// ============================================
+
+Table activo_fijos {
+  id bigint [pk, increment]
+  codigo_inventario varchar(20) [unique, null, note: 'Inventory code format: CAT-YYYY-NNNN']
+  nombre varchar(255) [not null]
+  marca_id bigint [null, ref: > marcas.id]
+  modelo_id bigint [null, ref: > modelos.id]
+  color_id bigint [null, ref: > colors.id]
+  categoria_id bigint [null, ref: > categorias.id]
+  departamento_id bigint [null, ref: > departamentos.id]
+  ubicacion_id bigint [null, ref: > ubicacions.id]
+  fuente_id bigint [null, ref: > fuentes.id]
+  proveedor_id bigint [null, ref: > proveedors.id]
+  responsable_id bigint [null, ref: > personal_responsables.id]
+  estado_id bigint [null, ref: > estado_activos.id]
+  fecha_adquisicion date [null]
+  valor_adquisicion decimal(12,2) [null]
+  vida_util_anios integer [null]
+  imagen_url varchar(255) [null]
+  valor_residual decimal(12,2) [null]
+  valor_residual_automatico boolean [default: true, note: 'Auto-calculate residual value']
+  depreciacion_acumulada decimal(12,2) [default: 0]
+  user_creacion_id bigint [null, ref: > users.id]
+  user_modificacion_id bigint [null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Main fixed assets table - core entity of the system'
+}
+
+Table vehiculos {
+  id bigint [pk, increment]
+  placa varchar(20) [unique, not null]
+  numero_motor varchar(50) [null]
+  chasis varchar(50) [unique, null]
+  numero_circulacion varchar(50) [null, note: 'Circulation number']
+  anio integer [null, note: 'Manufacturing year']
+  kilometraje decimal(10,2) [null, note: 'Current mileage']
+  capacidad_pasajeros integer [null, note: 'Passenger capacity']
+  tipo_combustible varchar(50) [null, note: 'Fuel type']
+  activo_fijo_id bigint [unique, not null, ref: - activo_fijos.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Vehicle-specific details (extends activo_fijos)'
+}
+
+Table terrenos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [unique, not null, ref: - activo_fijos.id]
+  dominio varchar(255) [null, note: 'Alcaldía Municipal o Gobierno Central']
+  numero_escritura varchar(100) [unique, not null, note: 'Deed number']
+  area_metros_cuadrados decimal(12,2) [not null, note: 'Area in square meters']
+  frente_metros decimal(10,2) [null, note: 'Front measurement in meters']
+  fondo_metros decimal(10,2) [null, note: 'Depth measurement in meters']
+  lindero_norte text [null, note: 'North boundary']
+  lindero_sur text [null, note: 'South boundary']
+  lindero_este text [null, note: 'East boundary']
+  lindero_oeste text [null, note: 'West boundary']
+  coordenadas_gps varchar(255) [null, note: 'GPS coordinates']
+  uso_suelo varchar(255) [null, note: 'Land use']
+  zonificacion varchar(255) [null, note: 'Zoning classification']
+  valor_catastral decimal(12,2) [null, note: 'Cadastral value']
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Land/terrain-specific details (extends activo_fijos)'
+}
+
+// ============================================
+// TRANSACTIONAL TABLES
+// ============================================
+
+Table mantenimientos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  fecha date [not null]
+  descripcion text [not null]
+  costo decimal(12,2) [null]
+  tecnico_id bigint [null, ref: > tecnicos.id]
+  proveedor_id bigint [null, ref: > proveedors.id]
+  estado_id bigint [not null, ref: > estado_activos.id]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset maintenance records'
+}
+
+Table movimientos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  ubicacion_origen_id bigint [not null, ref: > ubicacions.id]
+  ubicacion_destino_id bigint [not null, ref: > ubicacions.id]
+  responsable_origen_id bigint [not null, ref: > personal_responsables.id]
+  responsable_destino_id bigint [not null, ref: > personal_responsables.id]
+  fecha datetime [default: `CURRENT_TIMESTAMP`]
+  motivo text [not null]
+  status varchar(50) [null, note: 'Movement status (pending, approved, rejected)']
+  motivo_rechazo text [null, note: 'Rejection reason if applicable']
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset movements/transfers between locations and responsibles'
+}
+
+Table baja_activos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  fecha date [not null]
+  motivo text [not null]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset retirement/disposal records'
+}
+
+Table cambio_estados {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  estado_anterior_id bigint [not null, ref: > estado_activos.id]
+  estado_nuevo_id bigint [not null, ref: > estado_activos.id]
+  fecha datetime [default: `CURRENT_TIMESTAMP`]
+  user_id bigint [not null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Asset status change history'
+}
+
+Table auditoria_activos {
+  id bigint [pk, increment]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  usuario_id bigint [not null, ref: > users.id]
+  accion varchar(255) [not null, note: 'Action: created, updated, deleted']
+  valores_anteriores text [null, note: 'Previous values (JSON)']
+  valores_nuevos text [null, note: 'New values (JSON)']
+  fecha_hora datetime [not null]
+  
+  Note: 'Complete audit trail for all asset changes'
+}
+
+// ============================================
+// INVENTORY MANAGEMENT TABLES
+// ============================================
+
+Table inventarios {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null, note: 'e.g., "Inventario Anual 2025"']
+  fecha_inicio date [not null]
+  fecha_fin date [null]
+  estado enum('abierto', 'cerrado') [default: 'abierto']
+  user_id bigint [not null, ref: > users.id]
+  observaciones text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Physical inventory processes'
+}
+
+Table inventario_detalles {
+  id bigint [pk, increment]
+  inventario_id bigint [not null, ref: > inventarios.id]
+  activo_fijo_id bigint [not null, ref: > activo_fijos.id]
+  verificado boolean [default: false]
+  fecha_verificacion timestamp [null]
+  estado_fisico_id bigint [null, ref: > estado_activos.id]
+  comentarios text [null]
+  verificado_por bigint [null, ref: > users.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Individual asset verification records within an inventory'
+}
+
+// ============================================
+// SYSTEM TABLES
+// ============================================
+
+Table settings {
+  id bigint [pk, increment]
+  key varchar(255) [unique, not null]
+  value text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'System configuration settings'
+}
+
+Table notifications {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  type varchar(255) [not null]
+  data text [null]
+  read_at timestamp [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'User notifications'
+}
+
+Table reporte_historial {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  tipo_reporte varchar(100) [not null]
+  parametros text [null, note: 'Report parameters (JSON)']
+  fecha_generacion datetime [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Report generation history'
+}
+
+Table cache {
+  key varchar(255) [pk]
+  value mediumtext [not null]
+  expiration integer [not null]
+  
+  Note: 'Application cache storage'
+}
+
+Table cache_locks {
+  key varchar(255) [pk]
+  owner varchar(255) [not null]
+  expiration integer [not null]
+  
+  Note: 'Cache lock management'
+}
+
+Table jobs {
+  id bigint [pk, increment]
+  queue varchar(255) [not null]
+  payload longtext [not null]
+  attempts tinyint [not null]
+  reserved_at integer [null]
+  available_at integer [not null]
+  created_at integer [not null]
+  
+  indexes {
+    queue
+  }
+  
+  Note: 'Queue jobs for background processing'
+}
+
+Table job_batches {
+  id varchar(255) [pk]
+  name varchar(255) [not null]
+  total_jobs integer [not null]
+  pending_jobs integer [not null]
+  failed_jobs integer [not null]
+  failed_job_ids longtext [not null]
+  options mediumtext [null]
+  cancelled_at integer [null]
+  created_at integer [not null]
+  finished_at integer [null]
+  
+  Note: 'Batch job management'
+}
+
+Table failed_jobs {
+  id bigint [pk, increment]
+  uuid varchar(255) [unique, not null]
+  connection text [not null]
+  queue text [not null]
+  payload longtext [not null]
+  exception longtext [not null]
+  failed_at timestamp [default: `CURRENT_TIMESTAMP`]
+  
+  Note: 'Failed job records'
+}
+
+// ============================================
+// RELATIONSHIP NOTES
+// ============================================
+
+// Core Asset Relationships:
+// - activo_fijos is the central entity
+// - vehiculos and terrenos extend activo_fijos (1:1)
+// - All transactional tables reference activo_fijos
+
+// Catalog Relationships:
+// - modelos belongs to marcas
+// - personal_responsables belongs to cargos
+// - activo_fijos references multiple catalog tables
+
+// User & Permission Relationships:
+// - users <-> roles (many-to-many via usuario_rol)
+// - roles <-> permissions (many-to-many via role_permission)
+// - Most transactional tables track user_id for audit
+
+// Inventory Relationships:
+// - inventarios has many inventario_detalles
+// - inventario_detalles references activo_fijos and users

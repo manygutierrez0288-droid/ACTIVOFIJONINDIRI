@@ -116,7 +116,7 @@ class ReporteService
             case 'resumen_mensual':
                 return $query->get()->groupBy('categoria.nombre')->map(function ($items, $categoria) {
                     return [
-                        'Cuenta Contable' => $categoria,
+                        'Categoría' => $categoria,
                         'Cant.' => $items->count(),
                         'Valor Bruto' => number_format($items->sum('valor_adquisicion'), 2),
                         'Deprec. Mes' => number_format($items->sum('depreciacion_mensual'), 2),
@@ -211,6 +211,31 @@ class ReporteService
                         'Valor Catastral' => number_format((float) ($activo->terreno->valor_catastral ?? 0), 2),
                         'Valor Libros' => number_format((float) $activo->valor_adquisicion, 2),
                         'Departamento' => $activo->departamento->nombre ?? 'N/A',
+                    ];
+                });
+
+            case 'bajas':
+                $bajaQuery = \App\Models\BajaActivo::with(['activoFijo.categoria', 'activoFijo.departamento', 'user']);
+
+                if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
+                    $bajaQuery->whereBetween('fecha', [$filters['fecha_inicio'], $filters['fecha_fin']]);
+                }
+                if (!empty($filters['categoria_id'])) {
+                    $bajaQuery->whereHas('activoFijo', fn($q) => $q->where('categoria_id', $filters['categoria_id']));
+                }
+                if (!empty($filters['departamento_id'])) {
+                    $bajaQuery->whereHas('activoFijo', fn($q) => $q->where('departamento_id', $filters['departamento_id']));
+                }
+
+                return $bajaQuery->get()->map(function ($baja) {
+                    return [
+                        'Codigo' => $baja->activoFijo->codigo_inventario ?? 'N/A',
+                        'Activo' => $baja->activoFijo->nombre ?? 'N/A',
+                        'Fecha Baja' => $baja->fecha instanceof \Carbon\Carbon ? $baja->fecha->format('d/m/Y') : $baja->fecha,
+                        'Motivo' => $baja->motivo,
+                        'Documento' => $baja->documento_respaldo ?? 'N/A',
+                        'Ejecutado Por' => $baja->user->name ?? 'N/A',
+                        'Departamento' => $baja->activoFijo->departamento->nombre ?? 'N/A',
                     ];
                 });
 

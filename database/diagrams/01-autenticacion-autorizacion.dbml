@@ -1,0 +1,105 @@
+// SIAFNIN - Módulo de Autenticación y Autorización
+// Diagrama 1 de 6
+
+Project SIAFNIN_Auth {
+  database_type: 'MySQL'
+  Note: 'Módulo de Autenticación y Autorización - SIAFNIN'
+}
+
+// ============================================
+// USUARIOS Y AUTENTICACIÓN
+// ============================================
+
+Table users {
+  id bigint [pk, increment]
+  name varchar(255) [not null]
+  email varchar(255) [unique, not null]
+  email_verified_at timestamp [null]
+  password varchar(255) [not null]
+  remember_token varchar(100) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Usuarios del sistema con credenciales de autenticación'
+}
+
+Table password_reset_tokens {
+  email varchar(255) [pk]
+  token varchar(255) [not null]
+  created_at timestamp [null]
+  
+  Note: 'Tokens para recuperación de contraseña'
+}
+
+Table sessions {
+  id varchar(255) [pk]
+  user_id bigint [null, ref: > users.id]
+  ip_address varchar(45) [null]
+  user_agent text [null]
+  payload longtext [not null]
+  last_activity integer [not null]
+  
+  Note: 'Gestión de sesiones de usuario'
+}
+
+// ============================================
+// ROLES Y PERMISOS
+// ============================================
+
+Table roles {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description varchar(255) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Roles de usuario (Admin, Reportería, etc.)'
+}
+
+Table permissions {
+  id bigint [pk, increment]
+  name varchar(255) [unique, not null]
+  description varchar(255) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Permisos del sistema para control de acceso granular'
+}
+
+Table usuario_rol {
+  user_id bigint [not null, ref: > users.id]
+  role_id bigint [not null, ref: > roles.id]
+  
+  indexes {
+    (user_id, role_id) [pk]
+  }
+  
+  Note: 'Relación muchos a muchos entre usuarios y roles'
+}
+
+Table role_permission {
+  id bigint [pk, increment]
+  role_id bigint [not null, ref: > roles.id]
+  permission_id bigint [not null, ref: > permissions.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  indexes {
+    (role_id, permission_id) [unique]
+  }
+  
+  Note: 'Permisos asignados a cada rol'
+}
+
+Table notifications {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  type varchar(255) [not null]
+  data text [null]
+  read_at timestamp [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Notificaciones de usuario'
+}

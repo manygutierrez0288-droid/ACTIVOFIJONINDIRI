@@ -1,0 +1,110 @@
+// SIAFNIN - Módulo de Sistema y Reportes
+// Diagrama 6 de 6
+
+Project SIAFNIN_System {
+  database_type: 'MySQL'
+  Note: 'Sistema y Reportes - SIAFNIN'
+}
+
+// ============================================
+// TABLAS DE REFERENCIA (Simplificadas)
+// ============================================
+
+Table users {
+  id bigint [pk]
+  name varchar(255)
+  Note: 'Referencia a usuarios'
+}
+
+// ============================================
+// CONFIGURACIÓN DEL SISTEMA
+// ============================================
+
+Table settings {
+  id bigint [pk, increment]
+  key varchar(255) [unique, not null]
+  value text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Configuraciones del sistema'
+}
+
+// ============================================
+// REPORTES
+// ============================================
+
+Table reporte_historial {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  tipo_reporte varchar(100) [not null]
+  parametros text [null, note: 'Parámetros del reporte (JSON)']
+  fecha_generacion datetime [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Historial de generación de reportes'
+}
+
+// ============================================
+// CACHÉ Y TRABAJOS EN COLA
+// ============================================
+
+Table cache {
+  key varchar(255) [pk]
+  value mediumtext [not null]
+  expiration integer [not null]
+  
+  Note: 'Almacenamiento de caché de la aplicación'
+}
+
+Table cache_locks {
+  key varchar(255) [pk]
+  owner varchar(255) [not null]
+  expiration integer [not null]
+  
+  Note: 'Gestión de bloqueos de caché'
+}
+
+Table jobs {
+  id bigint [pk, increment]
+  queue varchar(255) [not null]
+  payload longtext [not null]
+  attempts tinyint [not null]
+  reserved_at integer [null]
+  available_at integer [not null]
+  created_at integer [not null]
+  
+  indexes {
+    queue
+  }
+  
+  Note: 'Trabajos en cola para procesamiento en segundo plano'
+}
+
+Table job_batches {
+  id varchar(255) [pk]
+  name varchar(255) [not null]
+  total_jobs integer [not null]
+  pending_jobs integer [not null]
+  failed_jobs integer [not null]
+  failed_job_ids longtext [not null]
+  options mediumtext [null]
+  cancelled_at integer [null]
+  created_at integer [not null]
+  finished_at integer [null]
+  
+  Note: 'Gestión de lotes de trabajos'
+}
+
+Table failed_jobs {
+  id bigint [pk, increment]
+  uuid varchar(255) [unique, not null]
+  connection text [not null]
+  queue text [not null]
+  payload longtext [not null]
+  exception longtext [not null]
+  failed_at timestamp [default: `CURRENT_TIMESTAMP`]
+  
+  Note: 'Registros de trabajos fallidos'
+}

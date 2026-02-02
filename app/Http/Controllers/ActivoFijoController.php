@@ -64,11 +64,12 @@ class ActivoFijoController extends Controller
 
     public function index(Request $request)
     {
-        $activos = $this->service->getAll();
+        $filters = $request->only(['search', 'categoria', 'departamento', 'estado']);
+        $activos = $this->service->getAll($filters);
 
         return Inertia::render('Activos/Index', [
             'activos' => ActivoFijoResource::collection($activos),
-            'filters' => $request->only(['search', 'categoria', 'departamento']),
+            'filters' => $filters,
             'categorias' => $this->categoriaService->getAll(),
             'departamentos' => $this->departamentoService->getAll(),
             'ubicaciones' => $this->ubicacionService->getAll(),

@@ -1,0 +1,155 @@
+// SIAFNIN - Módulo de Catálogos Maestros
+// Diagrama 2 de 6
+
+Project SIAFNIN_Catalogs {
+  database_type: 'MySQL'
+  Note: 'Catálogos Maestros - SIAFNIN'
+}
+
+// ============================================
+// CATÁLOGOS DE CLASIFICACIÓN
+// ============================================
+
+Table categorias {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null]
+  codigo varchar(5) [null]
+  porcentaje_valor_residual decimal(5,2) [default: 10.00]
+  descripcion varchar(255) [null]
+  vida_util_anios integer [default: 5]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Categorías de activos (Mobiliario, Equipo, Vehículos, etc.)'
+}
+
+Table departamentos {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null]
+  descripcion varchar(255) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Departamentos organizacionales'
+}
+
+Table ubicacions {
+  id bigint [pk, increment]
+  nombre varchar(255) [not null]
+  descripcion varchar(255) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Ubicaciones físicas para los activos'
+}
+
+Table estado_activos {
+  id bigint [pk, increment]
+  nombre varchar(50) [unique, not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Estados de activos (Activo, En Mantenimiento, Dado de Baja, etc.)'
+}
+
+// ============================================
+// CATÁLOGOS DE PRODUCTOS
+// ============================================
+
+Table marcas {
+  id bigint [pk, increment]
+  nombre varchar(100) [unique, not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Marcas/fabricantes de activos'
+}
+
+Table modelos {
+  id bigint [pk, increment]
+  nombre varchar(100) [not null]
+  marca_id bigint [not null, ref: > marcas.id]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Modelos asociados a marcas'
+}
+
+Table colors {
+  id bigint [pk, increment]
+  nombre varchar(50) [unique, not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Colores disponibles para activos'
+}
+
+// ============================================
+// CATÁLOGOS DE PROVEEDORES Y FUENTES
+// ============================================
+
+Table proveedors {
+  id bigint [pk, increment]
+  nombre varchar(100) [not null]
+  numero_ruc varchar(20) [unique, null]
+  telefono varchar(20) [null]
+  email varchar(100) [null]
+  direccion text [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Proveedores/vendedores'
+}
+
+Table fuentes {
+  id bigint [pk, increment]
+  nombre varchar(100) [unique, not null]
+  descripcion varchar(255) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Fuentes de financiamiento para adquisición de activos'
+}
+
+// ============================================
+// CATÁLOGOS DE PERSONAL
+// ============================================
+
+Table cargos {
+  id bigint [pk, increment]
+  nombre varchar(100) [unique, not null]
+  descripcion text [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Cargos/puestos de trabajo'
+}
+
+Table personal_responsables {
+  id bigint [pk, increment]
+  nombre varchar(150) [not null]
+  cargo_id bigint [not null, ref: > cargos.id]
+  numero_cedula varchar(20) [unique, not null]
+  telefono varchar(30) [null]
+  email varchar(100) [null]
+  activo boolean [default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Personal responsable de activos'
+}
+
+Table tecnicos {
+  id bigint [pk, increment]
+  nombre varchar(150) [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  
+  Note: 'Técnicos de mantenimiento'
+}

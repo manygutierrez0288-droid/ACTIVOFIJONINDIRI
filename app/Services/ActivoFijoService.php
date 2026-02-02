@@ -16,9 +16,9 @@ class ActivoFijoService extends BaseService
         $this->repository = $repository;
     }
 
-    public function getAll()
+    public function getAll($filters = [])
     {
-        return $this->repository->getAllWithRelations();
+        return $this->repository->getAllWithRelations($filters);
     }
     public function getById($id)
     {
