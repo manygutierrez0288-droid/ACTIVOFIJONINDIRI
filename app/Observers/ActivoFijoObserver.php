@@ -14,9 +14,18 @@ class ActivoFijoObserver
             $activoFijo->user_creacion_id = auth()->id();
         }
 
-        // Regla de Negocio: 5 años de vida útil por defecto si no se especifica
+        // Regla de Negocio: Heredar vida útil de la categoría si no se especifica
         if (is_null($activoFijo->vida_util_anios)) {
-            $activoFijo->vida_util_anios = 5;
+            $vidaUtil = 5; // Default fallback
+
+            if ($activoFijo->categoria_id) {
+                $categoria = \App\Models\Categoria::find($activoFijo->categoria_id);
+                if ($categoria && !is_null($categoria->vida_util_anios)) {
+                    $vidaUtil = $categoria->vida_util_anios;
+                }
+            }
+
+            $activoFijo->vida_util_anios = $vidaUtil;
         }
 
         // Regla de Negocio: Valor Residual del 20% automático

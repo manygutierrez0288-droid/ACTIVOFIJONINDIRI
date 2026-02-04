@@ -113,9 +113,13 @@ watch(
     ([newValor, newCatId, newAuto]) => {
         const cat = props.categorias.find(c => c.id == newCatId);
         
-        // Forzar 5 años excepto si la categoría indica 0 (Terrenos)
+        // Heredar vida útil según configuración de categoría
         if (cat && !isEditing.value) {
-            form.vida_util_anios = (cat.vida_util_anios === 0) ? 0 : 5;
+            if (cat.vida_util_anios !== null && cat.vida_util_anios !== undefined) {
+                 form.vida_util_anios = cat.vida_util_anios;
+            } else {
+                 form.vida_util_anios = 5;
+            }
         }
 
         if (newAuto) {
@@ -798,7 +802,7 @@ onMounted(() => {
                                         <div class="flex items-center justify-between mb-1">
                                             <InputLabel for="vida_util_anios" value="Vida Útil (Años)" class="text-[10px] font-bold uppercase text-gray-400" />
                                             <span class="text-[9px] font-black text-indigo-500 uppercase tracking-tighter bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">
-                                                {{ form.vida_util_anios == 0 ? 'No Depreciable' : 'Regla Institucional (5 Años)' }}
+                                                {{ form.vida_util_anios == 0 ? 'No Depreciable' : `Regla Categoría (${form.vida_util_anios} Años)` }}
                                             </span>
                                         </div>
                                         <input id="vida_util_anios" type="number" v-model="form.vida_util_anios" disabled class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white px-4 py-3 text-sm bg-gray-50/50 dark:bg-gray-800/50 opacity-70 cursor-not-allowed font-bold">
