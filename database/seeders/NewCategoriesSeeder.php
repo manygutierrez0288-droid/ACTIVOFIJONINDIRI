@@ -23,6 +23,7 @@ class NewCategoriesSeeder extends Seeder
             ['codigo' => '1100-1-04', 'nombre' => 'Escuelas municipales', 'grupo_categoria' => 'Edificaciones e Infraestructura', 'subcategoria' => 'Bienes Tangibles', 'clase' => '4'],
             ['codigo' => '1100-1-05', 'nombre' => 'Puentes y alcantarillas', 'grupo_categoria' => 'Edificaciones e Infraestructura', 'subcategoria' => 'Bienes Tangibles', 'clase' => '5'],
             ['codigo' => '1100-1-06', 'nombre' => 'Calles y pavimentación', 'grupo_categoria' => 'Edificaciones e Infraestructura', 'subcategoria' => 'Bienes Tangibles', 'clase' => '6'],
+            ['codigo' => '1100-1-07', 'nombre' => 'Aires Acondicionados', 'grupo_categoria' => 'Edificaciones e Infraestructura', 'subcategoria' => 'Climatización', 'clase' => '7', 'vida_util_anios' => 10],
 
             ['codigo' => '1200-1-01', 'nombre' => 'Escritorios', 'grupo_categoria' => 'Mobiliario y Equipos de Oficina', 'subcategoria' => 'Bienes Tangibles', 'clase' => '1'],
             ['codigo' => '1200-1-02', 'nombre' => 'Sillas', 'grupo_categoria' => 'Mobiliario y Equipos de Oficina', 'subcategoria' => 'Bienes Tangibles', 'clase' => '2'],
@@ -30,8 +31,8 @@ class NewCategoriesSeeder extends Seeder
             ['codigo' => '1200-1-04', 'nombre' => 'Mesas de reunión', 'grupo_categoria' => 'Mobiliario y Equipos de Oficina', 'subcategoria' => 'Bienes Tangibles', 'clase' => '4'],
             ['codigo' => '1200-1-05', 'nombre' => 'Estanterías', 'grupo_categoria' => 'Mobiliario y Equipos de Oficina', 'subcategoria' => 'Bienes Tangibles', 'clase' => '5'],
 
-            ['codigo' => '1300-1-01', 'nombre' => 'Computadoras de escritorio', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '1'],
-            ['codigo' => '1300-1-02', 'nombre' => 'Laptops', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '2'],
+            ['codigo' => '1300-1-01', 'nombre' => 'Computadoras de escritorio', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '1', 'vida_util_anios' => 2],
+            ['codigo' => '1300-1-02', 'nombre' => 'Laptops', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '2', 'vida_util_anios' => 2],
             ['codigo' => '1300-1-03', 'nombre' => 'Impresoras', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '3'],
             ['codigo' => '1300-1-04', 'nombre' => 'Servidores', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '4'],
             ['codigo' => '1300-1-05', 'nombre' => 'Proyectores', 'grupo_categoria' => 'Equipos de Tecnología', 'subcategoria' => 'Bienes Tangibles', 'clase' => '5'],
