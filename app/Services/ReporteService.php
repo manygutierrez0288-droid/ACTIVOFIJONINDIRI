@@ -13,7 +13,7 @@ class ReporteService
 {
     public function getReportData(string $type, array $filters = [])
     {
-        $query = ActivoFijo::with(['categoria', 'departamento', 'ubicacion', 'responsable', 'estado']);
+        $query = ActivoFijo::with(['categoria', 'departamento', 'ubicacion', 'responsable', 'estado', 'marca', 'modelo']);
 
         $this->applyFilters($query, $filters);
 
@@ -129,8 +129,11 @@ class ReporteService
             default:
                 return $query->get()->map(function ($activo) {
                     return [
-                        'ID' => $activo->id,
+                        'Codigo' => $activo->codigo_inventario ?? 'S/N',
                         'Nombre' => $activo->nombre,
+                        'Marca' => $activo->marca->nombre ?? 'N/A',
+                        'Modelo' => $activo->modelo->nombre ?? 'N/A',
+                        'Serie' => $activo->numero_serie ?? 'N/A',
                         'Categoria' => $activo->categoria->nombre ?? 'N/A',
                         'Departamento' => $activo->departamento->nombre ?? 'N/A',
                         'Ubicacion' => $activo->ubicacion->nombre ?? 'N/A',
@@ -189,7 +192,13 @@ class ReporteService
                     });
 
             case 'usuarios':
-                return \App\Models\User::with('roles')->get()->map(function ($user) {
+                $userQuery = \App\Models\User::with('roles');
+
+                if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
+                    $userQuery->whereBetween('created_at', [$filters['fecha_inicio'] . ' 00:00:00', $filters['fecha_fin'] . ' 23:59:59']);
+                }
+
+                return $userQuery->get()->map(function ($user) {
                     return [
                         'Nombre' => $user->name,
                         'Correo Electrónico' => $user->email,

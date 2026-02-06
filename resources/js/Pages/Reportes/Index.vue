@@ -274,7 +274,7 @@ const userSummary = computed(() => {
                             </div>
 
                             <div class="space-y-6">
-                                <div class="space-y-2">
+                                <div v-if="reportType !== 'usuarios'" class="space-y-2">
                                     <InputLabel value="Categoría de Activo" class="text-[10px] font-bold uppercase text-gray-400" />
                                     <select v-model="filters.categoria_id" class="w-full border-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs font-bold p-3">
                                         <option value="">Todas las categorías</option>
@@ -282,7 +282,7 @@ const userSummary = computed(() => {
                                     </select>
                                 </div>
 
-                                <div class="space-y-2">
+                                <div v-if="reportType !== 'usuarios'" class="space-y-2">
                                     <InputLabel value="Departamento / Área" class="text-[10px] font-bold uppercase text-gray-400" />
                                     <select v-model="filters.departamento_id" class="w-full border-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs font-bold p-3">
                                         <option value="">Todos los departamentos</option>
