@@ -245,6 +245,9 @@ class ReporteService
                 if (!empty($filters['departamento_id'])) {
                     $bajaQuery->whereHas('activoFijo', fn($q) => $q->where('departamento_id', $filters['departamento_id']));
                 }
+                if (!empty($filters['responsable_id'])) {
+                    $bajaQuery->whereHas('activoFijo', fn($q) => $q->where('responsable_id', $filters['responsable_id']));
+                }
 
                 return $bajaQuery->get()->map(function ($baja) {
                     return [
@@ -283,6 +286,9 @@ class ReporteService
         }
         if (!empty($filters['ubicacion_id'])) {
             $query->where('ubicacion_id', $filters['ubicacion_id']);
+        }
+        if (!empty($filters['responsable_id'])) {
+            $query->where('responsable_id', $filters['responsable_id']);
         }
         if (!empty($filters['dominio'])) {
             $query->whereHas('terreno', function ($q) use ($filters) {

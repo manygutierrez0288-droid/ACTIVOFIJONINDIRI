@@ -6,6 +6,7 @@ use App\Services\ReporteService;
 use App\Services\CategoriaService;
 use App\Services\DepartamentoService;
 use App\Services\UbicacionService;
+use App\Services\PersonalResponsableService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
@@ -18,17 +19,20 @@ class ReporteController extends Controller
     protected $categoriaService;
     protected $departamentoService;
     protected $ubicacionService;
+    protected $responsableService;
 
     public function __construct(
         ReporteService $service,
         CategoriaService $categoriaService,
         DepartamentoService $departamentoService,
-        UbicacionService $ubicacionService
+        UbicacionService $ubicacionService,
+        PersonalResponsableService $responsableService
     ) {
         $this->service = $service;
         $this->categoriaService = $categoriaService;
         $this->departamentoService = $departamentoService;
         $this->ubicacionService = $ubicacionService;
+        $this->responsableService = $responsableService;
     }
 
     public function index()
@@ -37,6 +41,7 @@ class ReporteController extends Controller
             'categorias' => $this->categoriaService->getAll(),
             'departamentos' => $this->departamentoService->getAll(),
             'ubicaciones' => $this->ubicacionService->getAll(),
+            'responsables' => $this->responsableService->getAll(),
         ]);
     }
 
