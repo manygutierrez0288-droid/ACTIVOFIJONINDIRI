@@ -36,9 +36,14 @@ class ReporteService
                 // Get IDs of filtered assets
                 $assetIds = $query->pluck('id');
 
-                $movimientos = Movimiento::whereIn('activo_fijo_id', $assetIds)
-                    ->with(['activoFijo.responsable'])
-                    ->get()
+                $movimientosQuery = Movimiento::whereIn('activo_fijo_id', $assetIds)
+                    ->with(['activoFijo.responsable']);
+
+                if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
+                    $movimientosQuery->whereBetween('fecha', [$filters['fecha_inicio'], $filters['fecha_fin']]);
+                }
+
+                $movimientos = $movimientosQuery->get()
                     ->map(function ($mov) {
                         return [
                             'Fecha' => $mov->fecha ? $mov->fecha->format('Y-m-d') : $mov->created_at->format('Y-m-d'),
@@ -49,9 +54,14 @@ class ReporteService
                         ];
                     });
 
-                $mantenimientos = Mantenimiento::whereIn('activo_fijo_id', $assetIds)
-                    ->with(['activoFijo.responsable'])
-                    ->get()
+                $mantenimientosQuery = Mantenimiento::whereIn('activo_fijo_id', $assetIds)
+                    ->with(['activoFijo.responsable']);
+
+                if (!empty($filters['fecha_inicio']) && !empty($filters['fecha_fin'])) {
+                    $mantenimientosQuery->whereBetween('fecha', [$filters['fecha_inicio'], $filters['fecha_fin']]);
+                }
+
+                $mantenimientos = $mantenimientosQuery->get()
                     ->map(function ($mant) {
                         $fecha = $mant->fecha ? (\Carbon\Carbon::parse($mant->fecha)) : null;
                         return [
